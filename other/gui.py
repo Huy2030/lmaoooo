@@ -7,8 +7,8 @@ import shutil
 import random
 import string
 
-def random_name(length=50):
-    return ''.join(random.choices(string.ascii_lowercase + string.digits, k=length))
+def random_name(length=45):
+    return 'campfire_' + ''.join(random.choices(string.ascii_lowercase + string.digits, k=length))
 
 used_names = set()
 gui_mappings = []
@@ -258,6 +258,21 @@ def process_fonts():
 def create_chest_screen():
     chest_file = Path("staging/target/rp/ui/chest_screen.json")
     chest_file.parent.mkdir(parents=True, exist_ok=True)
+    
+    # Random tên thư mục gui
+    gui_folder_name = random_name(15)
+    gui_output_dir = Path(f"staging/target/rp/textures/{gui_folder_name}")
+    
+    # Rename thư mục gui nếu đã tồn tại
+    old_gui_dir = Path("staging/target/rp/textures/gui")
+    if old_gui_dir.exists():
+        shutil.move(str(old_gui_dir), str(gui_output_dir))
+    
+    # Cập nhật lại texture paths trong gui_mappings
+    for mapping in gui_mappings:
+        old_texture = mapping["texture"]
+        # Thay "textures/gui/" thành "textures/{gui_folder_name}/"
+        mapping["texture"] = old_texture.replace("textures/gui/", f"textures/{gui_folder_name}/")
     
     # Tạo chest_label visible
     visible_chars = " - ".join([f"'{m['char']}'" for m in gui_mappings])
