@@ -339,7 +339,7 @@ else
   }
   ' | sponge ./target/rp/animations/animation.campfire.disable.json
   cd -
-  python manager.py
+  python manager2.py
   
   cd ./staging
   # cleanup
@@ -1414,7 +1414,7 @@ if [ -f sprites.json ]; then
 fi
 
 cd -
-python manager.py
+python manager2.py
 cd ./staging
 
 rm -rf assets && rm -f pack.mcmeta && rm -f pack.png
