@@ -193,6 +193,7 @@ jobs:
         id: convert-pack
         continue-on-error: false
         env:
+          GITHUB_ISSUE_TITLE: ${{ github.event.issue.title }}
           PACK_URL: ${{ needs.get-pack-info.outputs.pack_url }}
           DEFAULT_PACK_URL: ${{ needs.get-pack-info.outputs.default_pack_url }}
           MERGE_PACK_URL: ${{ needs.get-pack-info.outputs.merge_pack_url }}
