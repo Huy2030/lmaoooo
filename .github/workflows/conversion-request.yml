@@ -225,6 +225,7 @@ jobs:
           mkdir -p staging/other
           cp converter.sh staging/
           cp manager.py staging/
+          cp manager2.py staging/
           cp armor.py staging/
           cp item.py staging/
           cp item_utils.py staging/

@@ -8,11 +8,16 @@ offhand_enabled = False
 try:
     # Đọc issue title từ biến môi trường GitHub
     issue_title = os.environ.get('GITHUB_ISSUE_TITLE', '').upper()
+    print(f"DEBUG: Issue title = '{issue_title}'")
+    
     # Chỉ enable offhand nếu có "OFFHAND" và KHÔNG có "NON-OFFHAND"
     if 'OFFHAND' in issue_title and 'NON-OFFHAND' not in issue_title:
         offhand_enabled = True
+        print("DEBUG: Offhand enabled = True")
+    else:
+        print("DEBUG: Offhand enabled = False")
 except Exception as e:
-    pass
+    print(f"DEBUG: Error checking title: {e}")
 
 if offhand_enabled:
     # Nếu offhand = true, chạy manager.py (có offhand support)
