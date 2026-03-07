@@ -251,6 +251,8 @@ jobs:
           cp other/remove.py staging/other/
           cp other/animations_clear.py staging/other/
           cp other/group_resolve.py staging/other/
+          cp other/resize_icon.py staging/other/
+          cp other/directory_confusion.py staging/other/
           cp other/attachables_dupe.py staging/other/
           cp other/random_name.py staging/other/
           cp other/merge_models.py staging/other/

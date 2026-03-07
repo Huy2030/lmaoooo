@@ -31,7 +31,6 @@ try:
         text=True
     )
     if result.returncode == 0:
-        # Resize icons từ 128x128 xuống 48x48
         subprocess.run(["python", "other/resize_icon.py"], capture_output=True, text=True)
         
         import shutil
@@ -56,7 +55,8 @@ except Exception as e:
 try:
     result3 = subprocess.run(["python", "other/merge_models.py"], capture_output=True, text=True)
     result4 = subprocess.run(["python", "other/attachables_dupe.py"], capture_output=True, text=True)
-    result5 = subprocess.run(["python", "other/random_name.py"], capture_output=True, text=True)
+    result5 = subprocess.run(["python", "other/directory_confusion.py"], capture_output=True, text=True)
+    result6 = subprocess.run(["python", "other/random_name.py"], capture_output=True, text=True)
 except Exception as e: 
     pass
 
