@@ -250,7 +250,6 @@ jobs:
           cp other/auto_sprites.py staging/other/
           cp other/remove.py staging/other/
           cp other/animations_clear.py staging/other/
-          cp other/resize_armor.py staging/other/
           cp other/group_resolve.py staging/other/
           cp other/attachables_dupe.py staging/other/
           cp other/random_name.py staging/other/

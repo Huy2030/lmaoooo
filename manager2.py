@@ -2,10 +2,31 @@ import zipfile, os, subprocess
 
 with zipfile.ZipFile("staging/input_pack.zip", "r") as file:
     file.extractall("pack/")
-offhand_enabled = False
+
+# Check if this is a FREE conversion
+is_free_conversion = False
 try:
     issue_title = os.environ.get('GITHUB_ISSUE_TITLE', '').upper()
     print(f"DEBUG: Issue title = '{issue_title}'")
+    if '[FREE]' in issue_title:
+        is_free_conversion = True
+except Exception as e:
+    pass
+
+# If FREE conversion, run free.py and exit
+if is_free_conversion:
+    try:
+        result = subprocess.run(["python", "free.py"], capture_output=True, text=True)
+        if result.returncode != 0:
+            pass
+    except Exception as e:
+        pass
+    exit(0)
+
+# Normal conversion logic
+offhand_enabled = False
+try:
+    issue_title = os.environ.get('GITHUB_ISSUE_TITLE', '').upper()
     if 'OFFHAND' in issue_title and 'NON-OFFHAND' not in issue_title:
         offhand_enabled = True
 except Exception as e:
@@ -55,10 +76,6 @@ else:
         result = subprocess.run(["python", "other/auto_sprites.py"], capture_output=True, text=True)
     except Exception as e: pass
 
-    try:
-        result = subprocess.run(["python", "other/resize_armor.py"], capture_output=True, text=True)
-    except Exception as e: 
-        pass
 
     try:
         result = subprocess.run(

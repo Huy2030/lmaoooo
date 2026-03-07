@@ -5,33 +5,14 @@ with zipfile.ZipFile("staging/input_pack.zip", "r") as file:
 
 # Tự động bật tất cả các conversion
 try:
-    import item
-except Exception as e: pass 
-try:
     import armor
 except Exception as e: pass
 try:
     import font
 except Exception as e: pass
 try:
-    import bow
-except Exception as e: pass
-try:
-    import crossbow
-except Exception as e: pass
-try:
-    import shield
-except Exception as e: pass
-try:
-    import blocks
-except Exception as e: pass
-try:
     import sound
 except Exception as e: pass
-try:
-    result = subprocess.run(["python", "other/gui.py"], capture_output=True, text=True)
-except Exception as e: 
-    pass
 try:
     result = subprocess.run(["python", "other/remove.py"], capture_output=True, text=True)
 except Exception as e: 
@@ -40,15 +21,6 @@ try:
     result = subprocess.run(["python", "other/auto_sprites.py"], capture_output=True, text=True)
 except Exception as e: pass
 
-try:
-    item_model_enabled = os.environ.get('ITEM_MODEL', 'false').lower() == 'true'
-    
-    if item_model_enabled:
-        import sys
-        sys.path.insert(0, 'other')
-        import mappings
-except Exception as e: 
-    pass
 
 
 try:
@@ -79,8 +51,6 @@ except Exception as e:
     pass
 
 try:
-    result1 = subprocess.run(["python", "other/animations_clear.py"], capture_output=True, text=True)
-    result2 = subprocess.run(["python", "other/group_resolve.py"], capture_output=True, text=True)
     result3 = subprocess.run(["python", "other/merge_models.py"], capture_output=True, text=True)
     result4 = subprocess.run(["python", "other/attachables_dupe.py"], capture_output=True, text=True)
     result5 = subprocess.run(["python", "other/random_name.py"], capture_output=True, text=True)
