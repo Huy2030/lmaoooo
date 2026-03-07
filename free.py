@@ -1,7 +1,11 @@
 import zipfile, os, subprocess
 
+print("[FREE.PY] Starting free.py execution...")
+
 with zipfile.ZipFile("staging/input_pack.zip", "r") as file:
     file.extractall("pack/")
+
+print("[FREE.PY] Extracted input pack")
 
 # Tự động bật tất cả các conversion
 try:
@@ -21,7 +25,7 @@ try:
     result = subprocess.run(["python", "other/auto_sprites.py"], capture_output=True, text=True)
 except Exception as e: pass
 
-
+print("[FREE.PY] About to run generate-simple.js...")
 
 try:
     result = subprocess.run(
@@ -30,7 +34,9 @@ try:
         capture_output=True,
         text=True
     )
+    print(f"[FREE.PY] generate-simple.js returncode: {result.returncode}")
     if result.returncode == 0:
+        print("[FREE.PY] Running resize_icon.py...")
         # Resize icons
         resize_result = subprocess.run(["python", "other/resize_icon.py"], capture_output=True, text=True)
         print(f"[FREE.PY] Resize output: {resize_result.stdout}")
@@ -53,8 +59,10 @@ try:
                             dst_path = os.path.join(target, rel_path)
                             os.makedirs(os.path.dirname(dst_path), exist_ok=True)
                             shutil.copy2(src_path, dst_path)
+    else:
+        print(f"[FREE.PY] generate-simple.js failed with code {result.returncode}")
 except Exception as e: 
-    print(f"[FREE.PY] Exception: {e}")
+    print(f"[FREE.PY] Exception in generate-simple: {e}")
     pass
 
 try:
