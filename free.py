@@ -31,7 +31,11 @@ try:
         text=True
     )
     if result.returncode == 0:
-        subprocess.run(["python", "other/resize_icon.py"], capture_output=True, text=True)
+        # Resize icons
+        resize_result = subprocess.run(["python", "other/resize_icon.py"], capture_output=True, text=True)
+        print(f"[FREE.PY] Resize output: {resize_result.stdout}")
+        if resize_result.stderr:
+            print(f"[FREE.PY] Resize error: {resize_result.stderr}")
         
         import shutil
         icon_source = "tools/generated_icons"
@@ -50,6 +54,7 @@ try:
                             os.makedirs(os.path.dirname(dst_path), exist_ok=True)
                             shutil.copy2(src_path, dst_path)
 except Exception as e: 
+    print(f"[FREE.PY] Exception: {e}")
     pass
 
 try:
