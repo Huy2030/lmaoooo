@@ -2,25 +2,16 @@ import zipfile, os, subprocess
 
 with zipfile.ZipFile("staging/input_pack.zip", "r") as file:
     file.extractall("pack/")
-
-# Kiểm tra offhand support từ GitHub issue title
 offhand_enabled = False
 try:
-    # Đọc issue title từ biến môi trường GitHub
     issue_title = os.environ.get('GITHUB_ISSUE_TITLE', '').upper()
     print(f"DEBUG: Issue title = '{issue_title}'")
-    
-    # Chỉ enable offhand nếu có "OFFHAND" và KHÔNG có "NON-OFFHAND"
     if 'OFFHAND' in issue_title and 'NON-OFFHAND' not in issue_title:
         offhand_enabled = True
-        print("DEBUG: Offhand enabled = True")
-    else:
-        print("DEBUG: Offhand enabled = False")
 except Exception as e:
-    print(f"DEBUG: Error checking title: {e}")
+    pass
 
 if offhand_enabled:
-    # Nếu offhand = true, chạy manager.py (có offhand support)
     try:
         result = subprocess.run(["python", "manager.py"], capture_output=True, text=True)
         if result.returncode != 0:
@@ -28,8 +19,6 @@ if offhand_enabled:
     except Exception as e:
         pass
 else:
-    # Nếu offhand = false, chạy các conversion thông thường (non-offhand)
-    # Tự động bật tất cả các conversion
     try:
         import item_non_offhand
     except Exception as e: pass 
