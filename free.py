@@ -31,6 +31,9 @@ try:
         text=True
     )
     if result.returncode == 0:
+        # Resize icons từ 128x128 xuống 48x48
+        subprocess.run(["python", "other/resize_icon.py"], capture_output=True, text=True)
+        
         import shutil
         icon_source = "tools/generated_icons"
         targets = [
