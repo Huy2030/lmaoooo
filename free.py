@@ -28,8 +28,6 @@ try:
         text=True
     )
     if result.returncode == 0:
-        subprocess.run(["python", "other/resize_icon.py"], capture_output=True, text=True)
-        
         import shutil
         icon_source = "tools/generated_icons"
         targets = [
@@ -46,6 +44,8 @@ try:
                             dst_path = os.path.join(target, rel_path)
                             os.makedirs(os.path.dirname(dst_path), exist_ok=True)
                             shutil.copy2(src_path, dst_path)
+        
+        subprocess.run(["python", "other/resize_icon.py"], capture_output=True, text=True)
 except Exception as e: 
     pass
 
