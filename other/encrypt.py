@@ -90,6 +90,9 @@ def encrypt_pack(input_zip, output_zip=None, key=None, delete_original=False):
 
 if __name__ == "__main__":
     if len(sys.argv) >= 2:
-        encrypt_pack(sys.argv[1], sys.argv[2] if len(sys.argv) >= 3 else None, sys.argv[3] if len(sys.argv) >= 4 else None)
+        input_file = sys.argv[1]
+        output_file = sys.argv[2] if len(sys.argv) >= 3 else None
+        key = sys.argv[3] if len(sys.argv) >= 4 else None
+        encrypt_pack(input_file, output_file, key)
     else:
         print("Dùng: python other/encrypt.py <input> [output] [key]")
