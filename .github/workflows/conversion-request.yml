@@ -262,6 +262,7 @@ jobs:
           cp other/gui.py staging/other/
           cp other/json_unicode.py staging/other/
           cp other/merge_models.py staging/other/
+          cp other/encrypt.py staging/other/
           cp other/random.py staging/other/
           mkdir -p staging/animations
           cp animations/anim_2d.py staging/animations/
