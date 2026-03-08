@@ -37,16 +37,20 @@ if offhand_enabled:
 else:
     try:
         import item_non_offhand
-    except Exception as e: pass 
+    except Exception as e: 
+        pass 
     try:
-    result = subprocess.run(["python", "other/layer_armor.py"], capture_output=True, text=True)
-    except Exception as e: pass
+        result = subprocess.run(["python", "other/layer_armor.py"], capture_output=True, text=True)
+    except Exception as e: 
+        pass
     try:
         import armor
-    except Exception as e: pass
+    except Exception as e: 
+        pass
     try:
         import font
-    except Exception as e: pass
+    except Exception as e: 
+        pass
     try:
         import bow_non_offhand
     except Exception as e: pass
