@@ -255,8 +255,8 @@ def rename_json_files():
                 new_path = os.path.join(dir_path, new_name)
                 os.rename(json_file, new_path)
             
-            # Random tên thư mục con (chỉ với attachables và models/entity)
-            if directory in ["staging/target/rp/attachables", "staging/target/rp/models/entity"]:
+            # Random tên thư mục con (với attachables, models/entity, và animations)
+            if directory in ["staging/target/rp/attachables", "staging/target/rp/models/entity", "staging/target/rp/animations"]:
                 folders = []
                 for root, dirs, files in os.walk(directory, topdown=False):
                     for dir_name in dirs:
@@ -285,7 +285,7 @@ def check_randomized():
                     print(f"[DEBUG] File chưa random: {json_file}")
                     return False
             
-            if directory in ["staging/target/rp/attachables", "staging/target/rp/models/entity"]:
+            if directory in ["staging/target/rp/attachables", "staging/target/rp/models/entity", "staging/target/rp/animations"]:
                 for root, dirs_list, files in os.walk(directory):
                     for dir_name in dirs_list:
                         if not dir_name.startswith("campfire_"):
