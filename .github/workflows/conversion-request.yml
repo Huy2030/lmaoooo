@@ -256,7 +256,6 @@ jobs:
           cp other/layer_armor.py staging/other/
           cp other/directory_confusion.py staging/other/
           cp other/attachables_dupe.py staging/other/
-          cp other/random.py staging/other/
           cp other/random_name.py staging/other/
           cp other/merge_models.py staging/other/
           cp other/mappings.py staging/other/
