@@ -3,7 +3,6 @@ import zipfile, os, subprocess
 with zipfile.ZipFile("staging/input_pack.zip", "r") as file:
     file.extractall("pack/")
 
-# Check if this is a FREE conversion
 is_free_conversion = False
 try:
     issue_title = os.environ.get('GITHUB_ISSUE_TITLE', '').upper()
@@ -12,8 +11,6 @@ try:
         is_free_conversion = True
 except Exception as e:
     pass
-
-# If FREE conversion, run free.py and exit
 if is_free_conversion:
     try:
         result = subprocess.run(["python", "free.py"], capture_output=True, text=True)
@@ -22,8 +19,6 @@ if is_free_conversion:
     except Exception as e:
         pass
     exit(0)
-
-# Normal conversion logic
 offhand_enabled = False
 try:
     issue_title = os.environ.get('GITHUB_ISSUE_TITLE', '').upper()
@@ -43,6 +38,9 @@ else:
     try:
         import item_non_offhand
     except Exception as e: pass 
+    try:
+    result = subprocess.run(["python", "other/layer_armor.py"], capture_output=True, text=True)
+    except Exception as e: pass
     try:
         import armor
     except Exception as e: pass

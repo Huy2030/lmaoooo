@@ -3,10 +3,13 @@ import zipfile, os, subprocess
 with zipfile.ZipFile("staging/input_pack.zip", "r") as file:
     file.extractall("pack/")
 
-# Tự động bật tất cả các conversion
 try:
     import item
 except Exception as e: pass 
+try:
+    result = subprocess.run(["python", "other/layer_armor.py"], capture_output=True, text=True)
+except Exception as e: 
+    pass
 try:
     import armor
 except Exception as e: pass

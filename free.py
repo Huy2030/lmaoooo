@@ -4,12 +4,6 @@ with zipfile.ZipFile("staging/input_pack.zip", "r") as file:
     file.extractall("pack/")
 
 try:
-    import armor
-except Exception as e: pass
-try:
-    import font
-except Exception as e: pass
-try:
     import sound
 except Exception as e: pass
 try:
@@ -54,6 +48,7 @@ try:
     result4 = subprocess.run(["python", "other/attachables_dupe.py"], capture_output=True, text=True)
     result5 = subprocess.run(["python", "other/directory_confusion.py"], capture_output=True, text=True)
     result6 = subprocess.run(["python", "other/random_name.py"], capture_output=True, text=True)
+    result7 = subprocess.run(["python", "other/random.py"], capture_output=True, text=True)
 except Exception as e: 
     pass
 
