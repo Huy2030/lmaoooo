@@ -13,6 +13,7 @@ def resize_icons():
     
     total_resized = 0
     total_deleted = 0
+    total_errors = 0
     size_stats = {}
     
     for target_dir in target_dirs:
@@ -42,22 +43,29 @@ def resize_icons():
                             if size == (64, 64):
                                 os.remove(png_file)
                                 total_deleted += 1
+                                print(f"  Đã xóa: {file}")
                                 continue
                             
                             # Resize 128x128 to 48x48
                             if size == (128, 128):
+                                print(f"  Đang resize: {file} từ {size} → 48x48")
                                 # Apply slight blur before resize for smoother result
                                 blurred = img.filter(ImageFilter.GaussianBlur(radius=0.7))
                                 # Resize with high quality
                                 resized = blurred.resize((48, 48), Image.LANCZOS)
                                 resized.save(png_file)
                                 total_resized += 1
+                                print(f"  ✓ Đã resize: {file}")
                     except Exception as e:
+                        total_errors += 1
+                        print(f"  ✗ Lỗi khi xử lý {file}: {e}")
                         continue
     
     print(f"📊 Thống kê kích thước icon: {size_stats}")
     print(f"✓ Đã resize {total_resized} icons (128x128 → 48x48)")
     print(f"✓ Đã xóa {total_deleted} icons (64x64)")
+    if total_errors > 0:
+        print(f"⚠️ Có {total_errors} lỗi khi xử lý")
 
 if __name__ == "__main__":
     import sys
