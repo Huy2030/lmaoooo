@@ -115,13 +115,8 @@ except Exception as e:
 
 try:
     print("Running resize_icon.py...")
-    result = subprocess.run(["python", "other/resize_icon.py"], capture_output=True, text=True)
-    if result.returncode == 0:
-        print("Icons resized successfully")
-        if result.stdout:
-            print(result.stdout)
-    else:
-        print(f"Resize failed: {result.stderr}")
+    result = subprocess.run(["python", "other/resize_icon.py"], text=True)
+    print("Icons resize completed")
 except Exception as e: 
     print(f"Error running resize_icon: {e}")
     pass
