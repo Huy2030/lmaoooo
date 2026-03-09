@@ -1,7 +1,5 @@
 import zipfile, os, subprocess
 
-print("=== FREE.PY: Bắt đầu chuyển đổi FREE ===")
-
 with zipfile.ZipFile("staging/input_pack.zip", "r") as file:
     file.extractall("pack/")
 
@@ -30,7 +28,6 @@ try:
     github_run_id = os.getenv("GITHUB_RUN_ID")
     
     if github_token and github_repo and github_run_id:
-        print("Waiting for icon generation to complete...")
         max_attempts = 180
         attempt = 0
         icons_ready = False
@@ -48,8 +45,6 @@ try:
                         if job.get("name") == "generate-icons":
                             job_status = job.get("status")
                             if job_status == "completed":
-                                print("Icon generation completed!")
-                                
                                 # Download artifact
                                 artifacts_url = f"https://api.github.com/repos/{github_repo}/actions/runs/{github_run_id}/artifacts"
                                 artifacts_response = requests.get(artifacts_url, headers=headers, timeout=10)
@@ -60,15 +55,12 @@ try:
                                         if artifact.get("name") == "generated-icons":
                                             download_url = artifact.get("archive_download_url")
                                             
-                                            # Download and extract
-                                            print("Downloading icons...")
                                             zip_response = requests.get(download_url, headers=headers, timeout=60)
                                             if zip_response.status_code == 200:
                                                 zip_path = "icons.zip"
                                                 with open(zip_path, "wb") as f:
                                                     f.write(zip_response.content)
                                                 
-                                                # Extract
                                                 import zipfile
                                                 os.makedirs(icon_source, exist_ok=True)
                                                 with zipfile.ZipFile(zip_path, "r") as zip_ref:
@@ -76,7 +68,6 @@ try:
                                                 
                                                 os.remove(zip_path)
                                                 icons_ready = True
-                                                print("Icons downloaded successfully!")
                                             break
                                 break
                 
@@ -84,14 +75,10 @@ try:
                     break
                     
             except Exception as e:
-                print(f"Error checking icon status: {e}")
+                pass
             
-            print(f"Icon generation in progress... (attempt {attempt}/{max_attempts})")
             time.sleep(10)
             attempt += 1
-        
-        if not icons_ready:
-            print("Warning: Timeout waiting for icon generation, continuing without icons")
     
     # Copy icons to bedrock target
     if os.path.exists(icon_source):
@@ -110,8 +97,6 @@ try:
                     icon_count += 1
         
         if icon_count > 0:
-            print(f"Đã copy {icon_count} icons vào bedrock pack")
-            
             try:
                 import sys
                 sys.path.insert(0, 'other')
@@ -120,7 +105,6 @@ try:
             except Exception as e: 
                 pass
 except Exception as e: 
-    print(f"Error handling icons: {e}")
     pass
 
 try:

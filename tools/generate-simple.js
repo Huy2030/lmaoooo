@@ -749,8 +749,8 @@ async function generateIcon(page, modelPath, outputPath) {
         const base64Data = result.dataUrl.replace(/^data:image\/png;base64,/, '');
         let imageBuffer = Buffer.from(base64Data, 'base64');
         
-        // Remove isolated pixels (noise cleanup) - remove clusters smaller than 15 pixels
-        imageBuffer = await removeIsolatedPixels(imageBuffer, 15);
+        // Remove isolated pixels (noise cleanup) - remove clusters smaller than 3 pixels
+        imageBuffer = await removeIsolatedPixels(imageBuffer, 3);
         
         // Convert to 8-bit PNG with alpha (60-80% smaller)
         await sharp(imageBuffer)
