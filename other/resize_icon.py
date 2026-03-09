@@ -1,6 +1,16 @@
 import os
 from PIL import Image, ImageFilter
 import glob
+import sys
+
+# Debug: Print where this script is being called from
+if __name__ == "__main__":
+    print(f"=== RESIZE_ICON.PY DEBUG ===")
+    print(f"Current working directory: {os.getcwd()}")
+    print(f"Script location: {os.path.abspath(__file__)}")
+    print(f"Python executable: {sys.executable}")
+    print(f"Command line args: {sys.argv}")
+    print("=" * 50)
 
 def resize_icons():
     """Resize tất cả icon 128x128 xuống 48x48 với độ mờ nhẹ và xóa icon 64x64"""
@@ -61,5 +71,8 @@ def resize_icons():
     print(f"Deleted {total_deleted} icons (64x64)")
 
 if __name__ == "__main__":
+    import traceback
     print("resize_icon.py called directly")
+    print("Call stack:")
+    traceback.print_stack()
     resize_icons()

@@ -269,44 +269,8 @@ jobs:
           mkdir -p staging
           mkdir -p staging/other
           cp converter.sh staging/
-          cp manager.py staging/
-          cp manager2.py staging/
-          cp free.py staging/
-          cp armor.py staging/
-          cp item.py staging/
-          cp item_utils.py staging/
-          cp item_non_offhand.py staging/
-          cp item_non_offhand_utils.py staging/
-          cp bow.py staging/
-          cp bow_util.py staging/
-          cp bow2d.py staging/
-          cp bow_non_offhand.py staging/
-          cp bow_non_offhand_utils.py staging/
-          cp crossbow.py staging/
-          cp crossbow_util.py staging/
-          cp crossbow_non_offhand.py staging/
-          cp crossbow_non_offhand_utils.py staging/
-          cp shield.py staging/
-          cp shield_util.py staging/
-          cp blocks.py staging/
-          cp sound.py staging/
-          cp font.py staging/
-          cp font_sprite.py staging/
-          cp other/auto_sprites.py staging/other/
-          cp other/remove.py staging/other/
-          cp other/animations_clear.py staging/other/
-          cp other/group_resolve.py staging/other/
-          cp other/resize_icon.py staging/other/
-          cp other/layer_armor.py staging/other/
-          cp other/directory_confusion.py staging/other/
-          cp other/attachables_dupe.py staging/other/
-          cp other/random_name.py staging/other/
-          cp other/merge_models.py staging/other/
-          cp other/mappings.py staging/other/
-          cp other/gui.py staging/other/
-          cp other/json_unicode.py staging/other/
-          cp other/merge_models.py staging/other/
-          cp other/encrypt.py staging/other/
+          cp *.py staging/
+          cp other/*.py staging/other/
           mkdir -p staging/animations
           cp animations/anim_2d.py staging/animations/
           mkdir -p staging/tools
