@@ -11,9 +11,15 @@ def resize_icons():
     
     skip_folder = "campfire_item"
     
+    total_resized = 0
+    total_deleted = 0
+    
     for target_dir in target_dirs:
         if not os.path.exists(target_dir):
+            print(f"Directory not found: {target_dir}")
             continue
+        
+        print(f"Processing directory: {target_dir}")
         
         for root, dirs, files in os.walk(target_dir):
             rel_root = os.path.relpath(root, target_dir)
@@ -31,6 +37,7 @@ def resize_icons():
                             # Delete 64x64 icons
                             if size == (64, 64):
                                 os.remove(png_file)
+                                total_deleted += 1
                                 continue
                             
                             # Resize 128x128 to 48x48
@@ -40,8 +47,12 @@ def resize_icons():
                                 # Resize with high quality
                                 resized = blurred.resize((48, 48), Image.LANCZOS)
                                 resized.save(png_file)
+                                total_resized += 1
                     except Exception as e:
                         continue
+    
+    print(f"Resized {total_resized} icons (128x128 -> 48x48)")
+    print(f"Deleted {total_deleted} icons (64x64)")
 
 if __name__ == "__main__":
     resize_icons()

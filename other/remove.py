@@ -121,10 +121,36 @@ def remove_empty_directories(directory):
                 pass
     return removed_count
 
+def remove_empty_sounds_folder():
+    """Xóa thư mục sounds nếu không có thư mục con nào bên trong"""
+    sounds_dir = "staging/target/rp/sounds"
+    
+    if not os.path.exists(sounds_dir):
+        return
+    
+    try:
+        # Lấy danh sách tất cả items trong sounds
+        items = os.listdir(sounds_dir)
+        
+        # Kiểm tra xem có thư mục con nào không
+        has_subdirs = False
+        for item in items:
+            item_path = os.path.join(sounds_dir, item)
+            if os.path.isdir(item_path):
+                has_subdirs = True
+                break
+        
+        # Nếu không có thư mục con nào, xóa toàn bộ sounds folder
+        if not has_subdirs:
+            shutil.rmtree(sounds_dir)
+    except Exception as e:
+        pass
+
 if __name__ == "__main__":
     cleanup_fishing_cast_textures()
     cleanup_unwanted_files()
     
     if os.path.exists("staging/target/rp"):
         minify_all_json("staging/target/rp")
+        remove_empty_sounds_folder()
         remove_empty_directories("staging/target/rp")
