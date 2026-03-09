@@ -750,7 +750,7 @@ async function generateIcon(page, modelPath, outputPath) {
         let imageBuffer = Buffer.from(base64Data, 'base64');
         
         // Remove isolated pixels (noise cleanup) - remove clusters smaller than 3 pixels
-        imageBuffer = await removeIsolatedPixels(imageBuffer, 3);
+        imageBuffer = await removeIsolatedPixels(imageBuffer, 5);
         
         // Save as RGBA 32-bit PNG (no palette, no resize)
         await sharp(imageBuffer)
