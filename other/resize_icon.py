@@ -44,7 +44,7 @@ def resize_icons():
                                     img = img.convert('RGBA')
                                 
                                 # Use NEAREST to maintain sharp pixel edges (no anti-aliasing)
-                                resized = img.resize((48, 48), Image.NEAREST)
+                                resized = img.resize((32, 32), Image.NEAREST)
                                 
                                 # Save as RGBA PNG
                                 resized.save(png_file, 'PNG', optimize=True, compress_level=9)
