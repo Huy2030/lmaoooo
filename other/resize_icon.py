@@ -3,7 +3,7 @@ from PIL import Image, ImageFilter
 import glob
 
 def resize_icons():
-    """Resize tất cả icon 128x128 xuống 48x48 với độ mờ nhẹ và xóa icon 64x64"""
+    """Resize tất cả icon 128x128 xuống 48x48 và xóa icon 64x64"""
     target_dirs = [
         "staging/target/rp/textures",
         "bedrock/textures"
@@ -43,12 +43,10 @@ def resize_icons():
                                 if img.mode != 'RGBA':
                                     img = img.convert('RGBA')
                                 
-                                # Apply slight blur before resize for smoother result
-                                blurred = img.filter(ImageFilter.GaussianBlur(radius=0.7))
-                                # Resize with high quality
-                                resized = blurred.resize((48, 48), Image.LANCZOS)
+                                # Use NEAREST to maintain sharp pixel edges (no anti-aliasing)
+                                resized = img.resize((48, 48), Image.NEAREST)
                                 
-                                # Save as RGBA PNG (keep alpha channel, don't convert to palette)
+                                # Save as RGBA PNG
                                 resized.save(png_file, 'PNG', optimize=True, compress_level=9)
                                 total_resized += 1
                     except Exception as e:
