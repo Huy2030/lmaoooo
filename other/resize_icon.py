@@ -28,13 +28,15 @@ def resize_icons():
                         with Image.open(png_file) as img:
                             size = img.size
                             
+                            # Delete 64x64 icons
                             if size == (64, 64):
                                 os.remove(png_file)
                                 continue
                             
+                            # Resize 128x128 to 48x48
                             if size == (128, 128):
                                 # Apply slight blur before resize for smoother result
-                                blurred = img.filter(ImageFilter.GaussianBlur(radius=0.5))
+                                blurred = img.filter(ImageFilter.GaussianBlur(radius=0.7))
                                 # Resize with high quality
                                 resized = blurred.resize((48, 48), Image.LANCZOS)
                                 resized.save(png_file)
