@@ -1148,7 +1148,7 @@ async function main() {
         });
         
         // Create parallel workers (pages)
-        const WORKERS = 8;
+        const WORKERS = process.env.CI ? 2 : 8; // Use 2 workers on CI (GitHub Actions), 8 locally
         
         const workers = [];
         for (let i = 0; i < WORKERS; i++) {

@@ -46,25 +46,25 @@ jobs:
       - name: Parse Issue Body
         id: parse-body
         run: |
-          # Check title for V2
-          ISSUE_TITLE="${{ github.event.issue.title }}"
-          if echo "$ISSUE_TITLE" | grep -qi "V2"; then
+          cat << 'EOF' > issue_body.txt
+          ${{ github.event.issue.body }}
+          EOF
+          
+          if grep -A 2 "All Items Conversion" issue_body.txt | grep -q "true"; then
+            echo "ALL_ITEMS=true" >> $GITHUB_OUTPUT
+          else
+            echo "ALL_ITEMS=false" >> $GITHUB_OUTPUT
+          fi
+          
+          if grep -A 2 "Conversion Mappings V2" issue_body.txt | grep -q "true"; then
             echo "ITEM_MODEL=true" >> $GITHUB_OUTPUT
-            echo "DEBUG: Found V2 in title, enabling item_model"
           else
             echo "ITEM_MODEL=false" >> $GITHUB_OUTPUT
-            echo "DEBUG: V2 not found in title, disabling item_model"
           fi
       - name: Organize Inputs
         id: organize-inputs
         run: |
-          cat <<'JSON' > raw.json
-          ${{ toJSON(steps.parse-issue.outputs.data) }}
-          JSON
-          
-          cat raw.json | jq -r '.' > parsed.json
-          
-          jq '
+          echo ${{ toJSON(steps.parse-issue.outputs.data) }} | jq '
           def test_input($input; $default):
           if ($input == "*No response*" or $input == "None" or $input == "null") then $default else ($input | tostring | gsub("\\\\";""))  end;
           
@@ -103,18 +103,12 @@ jobs:
             "item_model": (if (.["itemmodel"].text | tostring) == "true" then "true" else "false" end),
             "json_unicode_conversion": test_input(.["json-unicode-conversion"].text; "false"),
             "encrypt_pack": test_input(.["encrypt-pack"].text; "false")
-          }' parsed.json > inputs.json
+          }' > inputs.json
           
-          # Override with direct parse from title
+          # Override with direct parse from issue body
           ITEM_MODEL_DIRECT="${{ steps.parse-body.outputs.ITEM_MODEL }}"
-          echo "DEBUG: ITEM_MODEL_DIRECT = $ITEM_MODEL_DIRECT"
           if [ "$ITEM_MODEL_DIRECT" == "true" ]; then
-            echo "DEBUG: Setting item_model to true"
             jq '.item_model = "true"' inputs.json > inputs_temp.json
-            mv inputs_temp.json inputs.json
-          elif [ "$ITEM_MODEL_DIRECT" == "false" ]; then
-            echo "DEBUG: Setting item_model to false"
-            jq '.item_model = "false"' inputs.json > inputs_temp.json
             mv inputs_temp.json inputs.json
           fi
           
@@ -152,6 +146,53 @@ jobs:
           echo "JSON_UNICODE_CONVERSION=$(jq -r '.json_unicode_conversion' inputs.json)" >> $GITHUB_OUTPUT
           echo "ENCRYPT_PACK=$(jq -r '.encrypt_pack' inputs.json)" >> $GITHUB_OUTPUT
           
+  generate-icons:
+    runs-on: ubuntu-latest
+    needs: get-pack-info
+    permissions:
+      contents: read
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Install NodeJS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Cache tools node_modules
+        uses: actions/cache@v4
+        with:
+          path: tools/node_modules
+          key: ${{ runner.os }}-tools-${{ hashFiles('tools/package.json') }}
+      - name: Install icon generator dependencies
+        run: |
+          cd tools
+          npm install
+          cd ..
+      - name: Install Puppeteer Chromium
+        run: |
+          npx puppeteer browsers install chrome
+      - name: Download and prepare pack
+        env:
+          PACK_URL: ${{ needs.get-pack-info.outputs.pack_url }}
+        run: |
+          mkdir -p pack
+          curl -#L -o input_pack.zip "${PACK_URL}"
+          unzip -q input_pack.zip -d pack/
+      - name: Generate icons
+        run: |
+          mkdir -p staging/target/rp/textures
+          node tools/generate-simple.js || echo "Icon generation failed, continuing..."
+      - name: Upload generated icons
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: generated-icons
+          path: staging/target/rp/textures/
+          retention-days: 1
+          if-no-files-found: warn
+          
   convert-pack:
     runs-on: ubuntu-latest
     needs: get-pack-info
@@ -163,7 +204,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
       - name: Enable default asset cache
         id: cache-default-assets
         uses: actions/cache@v4
@@ -180,20 +221,16 @@ jobs:
           python-version: '3.11'
       - name: Install dependencies
         run: |
-          sudo apt-get update || sudo apt-get update --fix-missing
           sudo apt-get install -y moreutils zip unzip imagemagick
           yarn global add spritesheet-js
           pip install Pillow requests jproperties pyyaml
-      - name: Install icon generator dependencies
-        run: |
-          cd tools
-          npm install
-          cd ..
       - name: Convert Pack
         id: convert-pack
         continue-on-error: false
         env:
-          GITHUB_ISSUE_TITLE: ${{ github.event.issue.title }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
           PACK_URL: ${{ needs.get-pack-info.outputs.pack_url }}
           DEFAULT_PACK_URL: ${{ needs.get-pack-info.outputs.default_pack_url }}
           MERGE_PACK_URL: ${{ needs.get-pack-info.outputs.merge_pack_url }}
@@ -225,44 +262,8 @@ jobs:
           mkdir -p staging
           mkdir -p staging/other
           cp converter.sh staging/
-          cp manager.py staging/
-          cp manager2.py staging/
-          cp free.py staging/
-          cp armor.py staging/
-          cp item.py staging/
-          cp item_utils.py staging/
-          cp item_non_offhand.py staging/
-          cp item_non_offhand_utils.py staging/
-          cp bow.py staging/
-          cp bow_util.py staging/
-          cp bow2d.py staging/
-          cp bow_non_offhand.py staging/
-          cp bow_non_offhand_utils.py staging/
-          cp crossbow.py staging/
-          cp crossbow_util.py staging/
-          cp crossbow_non_offhand.py staging/
-          cp crossbow_non_offhand_utils.py staging/
-          cp shield.py staging/
-          cp shield_util.py staging/
-          cp blocks.py staging/
-          cp sound.py staging/
-          cp font.py staging/
-          cp font_sprite.py staging/
-          cp other/auto_sprites.py staging/other/
-          cp other/remove.py staging/other/
-          cp other/animations_clear.py staging/other/
-          cp other/group_resolve.py staging/other/
-          cp other/resize_icon.py staging/other/
-          cp other/layer_armor.py staging/other/
-          cp other/directory_confusion.py staging/other/
-          cp other/attachables_dupe.py staging/other/
-          cp other/random_name.py staging/other/
-          cp other/merge_models.py staging/other/
-          cp other/mappings.py staging/other/
-          cp other/gui.py staging/other/
-          cp other/json_unicode.py staging/other/
-          cp other/merge_models.py staging/other/
-          cp other/encrypt.py staging/other/
+          cp *.py staging/
+          cp other/*.py staging/other/
           mkdir -p staging/animations
           cp animations/anim_2d.py staging/animations/
           mkdir -p staging/tools
@@ -277,17 +278,16 @@ jobs:
           fi
           ./converter.sh input_pack.zip -w "false" -m ${MERGE_PACK_FILE} -a ${ATTACHABLE_MATERIAL} -b ${BLOCK_MATERIAL} -f ${DEFAULT_PACK_URL} -v ${DEFAULT_ASSETS_VERSION} -r ${RENAME_MODEL_FILES} -s ${ARCHIVE_SCRATCH}
           
-          # Encryption after conversion (always enabled)
-          echo "Encrypting pack..."
-          python other/encrypt.py bedrock.mcpack bedrock_encrypted.mcpack || exit 1
-          if [ -f "bedrock_encrypted.mcpack" ]; then
-            rm -f bedrock.mcpack
-            mv bedrock_encrypted.mcpack bedrock.mcpack
-            mv bedrock_encrypted_key.txt bedrock.mcpack.key
-            echo "Pack encrypted successfully"
-          else
-            echo "Encryption failed"
-            exit 1
+          # Encryption after conversion
+          if [ "${ENCRYPT_PACK}" = "true" ]; then
+            python other/encrypt.py bedrock.mcpack bedrock_encrypted.mcpack || exit 1
+            if [ -f "bedrock_encrypted.mcpack" ]; then
+              rm -f bedrock.mcpack
+              mv bedrock_encrypted.mcpack bedrock.mcpack
+              mv bedrock_encrypted_key.txt bedrock.mcpack.key
+            else
+              exit 1
+            fi
           fi
       - name: Upload converted pack
         uses: actions/upload-artifact@v4
@@ -296,9 +296,13 @@ jobs:
           path: |
             staging/bedrock.mcpack
             staging/bedrock.mcpack.key
-            staging/mappings.json
-            staging/mappingsv1.json
-            staging/mappingsv2.json
+            staging/bedrock/
+            staging/*.json
+      - name: Delete generated-icons artifact
+        uses: geekyeggo/delete-artifact@v5
+        with:
+          name: generated-icons
+        continue-on-error: true
   post-result:
     runs-on: ubuntu-latest
     needs: convert-pack
