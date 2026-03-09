@@ -85,8 +85,10 @@ try:
                     for job in jobs_data.get("jobs", []):
                         if job.get("name") == "generate-icons":
                             job_status = job.get("status")
+                            job_conclusion = job.get("conclusion")
+                            
                             if job_status == "completed":
-                                print("Icon generation completed!")
+                                print(f"Icon generation completed with conclusion: {job_conclusion}")
                                 
                                 # Download artifact
                                 artifacts_url = f"https://api.github.com/repos/{github_repo}/actions/runs/{github_run_id}/artifacts"
@@ -94,8 +96,11 @@ try:
                                 
                                 if artifacts_response.status_code == 200:
                                     artifacts_data = artifacts_response.json()
+                                    artifact_found = False
+                                    
                                     for artifact in artifacts_data.get("artifacts", []):
                                         if artifact.get("name") == "generated-icons":
+                                            artifact_found = True
                                             download_url = artifact.get("archive_download_url")
                                             
                                             # Download and extract
@@ -116,6 +121,10 @@ try:
                                                 icons_ready = True
                                                 print("Icons downloaded successfully!")
                                             break
+                                    
+                                    if not artifact_found:
+                                        print("No icon artifact found - pack contains only 2D items")
+                                        icons_ready = True
                                 break
                 
                 if icons_ready:

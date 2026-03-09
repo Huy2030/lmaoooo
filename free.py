@@ -51,8 +51,11 @@ try:
                                 
                                 if artifacts_response.status_code == 200:
                                     artifacts_data = artifacts_response.json()
+                                    artifact_found = False
+                                    
                                     for artifact in artifacts_data.get("artifacts", []):
                                         if artifact.get("name") == "generated-icons":
+                                            artifact_found = True
                                             download_url = artifact.get("archive_download_url")
                                             
                                             zip_response = requests.get(download_url, headers=headers, timeout=60)
@@ -69,6 +72,9 @@ try:
                                                 os.remove(zip_path)
                                                 icons_ready = True
                                             break
+                                    
+                                    if not artifact_found:
+                                        icons_ready = True
                                 break
                 
                 if icons_ready:
