@@ -1,5 +1,7 @@
 import zipfile, os, subprocess
 
+print("=== FREE.PY STARTED ===")
+
 with zipfile.ZipFile("staging/input_pack.zip", "r") as file:
     file.extractall("pack/")
 

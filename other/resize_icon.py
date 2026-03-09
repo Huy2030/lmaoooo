@@ -13,6 +13,7 @@ def resize_icons():
     
     total_resized = 0
     total_deleted = 0
+    size_stats = {}
     
     for target_dir in target_dirs:
         if not os.path.exists(target_dir):
@@ -34,6 +35,10 @@ def resize_icons():
                         with Image.open(png_file) as img:
                             size = img.size
                             
+                            # Track size statistics
+                            size_key = f"{size[0]}x{size[1]}"
+                            size_stats[size_key] = size_stats.get(size_key, 0) + 1
+                            
                             # Delete 64x64 icons
                             if size == (64, 64):
                                 os.remove(png_file)
@@ -51,8 +56,10 @@ def resize_icons():
                     except Exception as e:
                         continue
     
+    print(f"Icon size statistics: {size_stats}")
     print(f"Resized {total_resized} icons (128x128 -> 48x48)")
     print(f"Deleted {total_deleted} icons (64x64)")
 
 if __name__ == "__main__":
+    print("resize_icon.py called directly")
     resize_icons()
