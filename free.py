@@ -109,16 +109,16 @@ try:
         
         if icon_count > 0:
             print(f"Copied {icon_count} icons to bedrock pack")
+            
+            # Resize icons after copying
+            try:
+                print("Running resize_icon.py...")
+                result = subprocess.run(["python", "other/resize_icon.py"], text=True)
+                print("Icons resize completed")
+            except Exception as e: 
+                print(f"Error running resize_icon: {e}")
 except Exception as e: 
     print(f"Error handling icons: {e}")
-    pass
-
-try:
-    print("Running resize_icon.py...")
-    result = subprocess.run(["python", "other/resize_icon.py"], text=True)
-    print("Icons resize completed")
-except Exception as e: 
-    print(f"Error running resize_icon: {e}")
     pass
 
 try:
