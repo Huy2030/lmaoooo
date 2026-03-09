@@ -110,15 +110,19 @@ try:
                     icon_count += 1
         
         if icon_count > 0:
-            print(f"Copied {icon_count} icons to bedrock pack")
+            print(f"Đã copy {icon_count} icons vào bedrock pack")
             
             # Resize icons after copying
             try:
-                print("Running resize_icon.py...")
-                result = subprocess.run(["python", "other/resize_icon.py"], text=True, capture_output=False)
-                print("Icons resize completed")
+                print("Đang resize icons...")
+                # Import và gọi trực tiếp thay vì subprocess
+                import sys
+                sys.path.insert(0, 'other')
+                import resize_icon
+                resize_icon.resize_icons()
+                print("✓ Hoàn thành resize icons")
             except Exception as e: 
-                print(f"Error running resize_icon: {e}")
+                print(f"Lỗi khi resize icons: {e}")
 except Exception as e: 
     print(f"Error handling icons: {e}")
     pass

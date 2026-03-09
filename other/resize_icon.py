@@ -17,10 +17,9 @@ def resize_icons():
     
     for target_dir in target_dirs:
         if not os.path.exists(target_dir):
-            print(f"Directory not found: {target_dir}")
             continue
         
-        print(f"Processing directory: {target_dir}")
+        print(f"Đang xử lý thư mục: {target_dir}")
         
         for root, dirs, files in os.walk(target_dir):
             rel_root = os.path.relpath(root, target_dir)
@@ -56,27 +55,17 @@ def resize_icons():
                     except Exception as e:
                         continue
     
-    print(f"Icon size statistics: {size_stats}")
-    print(f"Resized {total_resized} icons (128x128 -> 48x48)")
-    print(f"Deleted {total_deleted} icons (64x64)")
+    print(f"📊 Thống kê kích thước icon: {size_stats}")
+    print(f"✓ Đã resize {total_resized} icons (128x128 → 48x48)")
+    print(f"✓ Đã xóa {total_deleted} icons (64x64)")
 
 if __name__ == "__main__":
     import sys
-    import traceback
     
-    # Log chi tiết để debug
+    # Chỉ chạy nếu được gọi từ thư mục staging
     cwd = os.getcwd()
-    print(f"[RESIZE_ICON] Được gọi từ thư mục: {cwd}")
-    print(f"[RESIZE_ICON] Call stack:")
-    for line in traceback.format_stack()[:-1]:
-        print(line.strip())
-    
-    # Only run if called from staging directory (from free.py)
-    # Skip if called from root directory (premature call)
     if not cwd.endswith('staging') and 'staging' not in cwd:
-        print("[RESIZE_ICON] ⚠️ Bỏ qua - chưa đến thời điểm chạy (đang ở thư mục gốc)")
+        print("[RESIZE_ICON] ⚠️ Bỏ qua - script này chỉ nên được gọi từ free.py")
         sys.exit(0)
     
-    print("[RESIZE_ICON] ✓ Bắt đầu resize icons...")
     resize_icons()
-    print("[RESIZE_ICON] ✓ Hoàn thành resize icons")
