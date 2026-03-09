@@ -13,10 +13,11 @@ except Exception as e:
     pass
 if is_free_conversion:
     try:
-        result = subprocess.run(["python", "free.py"], capture_output=True, text=True)
-        if result.returncode != 0:
-            pass
+        print("Running free.py for FREE conversion...")
+        result = subprocess.run(["python", "free.py"], text=True)
+        print("Free conversion completed")
     except Exception as e:
+        print(f"Error in free.py: {e}")
         pass
     exit(0)
 offhand_enabled = False
