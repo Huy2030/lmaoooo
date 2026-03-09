@@ -49,11 +49,16 @@ def resize_icons():
                             # Resize 128x128 to 48x48
                             if size == (128, 128):
                                 print(f"  Đang resize: {file} từ {size} → 48x48")
+                                
+                                # Convert to RGBA if needed (fix "wrong mode" error)
+                                if img.mode != 'RGBA':
+                                    img = img.convert('RGBA')
+                                
                                 # Apply slight blur before resize for smoother result
                                 blurred = img.filter(ImageFilter.GaussianBlur(radius=0.7))
                                 # Resize with high quality
                                 resized = blurred.resize((48, 48), Image.LANCZOS)
-                                resized.save(png_file)
+                                resized.save(png_file, 'PNG')
                                 total_resized += 1
                                 print(f"  ✓ Đã resize: {file}")
                     except Exception as e:
