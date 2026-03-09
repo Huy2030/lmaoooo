@@ -1,9 +1,9 @@
 import os
-from PIL import Image
+from PIL import Image, ImageFilter
 import glob
 
 def resize_icons():
-    """Resize tất cả icon 128x128 xuống 48x48 và xóa icon 64x64"""
+    """Resize tất cả icon 128x128 xuống 48x48 với độ mờ nhẹ và xóa icon 64x64"""
     target_dirs = [
         "staging/target/rp/textures",
         "bedrock/textures"
@@ -33,7 +33,10 @@ def resize_icons():
                                 continue
                             
                             if size == (128, 128):
-                                resized = img.resize((48, 48), Image.LANCZOS)
+                                # Apply slight blur before resize for smoother result
+                                blurred = img.filter(ImageFilter.GaussianBlur(radius=0.5))
+                                # Resize with high quality
+                                resized = blurred.resize((48, 48), Image.LANCZOS)
                                 resized.save(png_file)
                     except Exception as e:
                         continue
