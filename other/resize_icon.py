@@ -72,7 +72,26 @@ def resize_icons():
 
 if __name__ == "__main__":
     import traceback
+    import sys
+    
+    # Get the parent process info
+    cwd = os.getcwd()
+    
+    print(f"=== RESIZE_ICON.PY DEBUG ===")
+    print(f"Current working directory: {cwd}")
+    print(f"Script location: {os.path.abspath(__file__)}")
+    print(f"Python executable: {sys.executable}")
+    print(f"Command line args: {sys.argv}")
+    print("=" * 50)
     print("resize_icon.py called directly")
     print("Call stack:")
     traceback.print_stack()
+    
+    # Only run if called from staging directory (from free.py)
+    # Skip if called from root directory (premature call)
+    if not cwd.endswith('staging') and 'staging' not in cwd:
+        print("WARNING: resize_icon.py called from wrong directory, skipping...")
+        print(f"Expected to be called from 'staging' directory, but current dir is: {cwd}")
+        sys.exit(0)
+    
     resize_icons()
