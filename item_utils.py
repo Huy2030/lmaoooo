@@ -378,21 +378,38 @@ class Item_Util:
                         "loop": True
                     },
                     "animation.player.first_person.attack_rotation": {
+                        "loop": True,
                         "bones": {
                             "rightarm": {
                                 "position": [
-                                    "math.clamp(-15.5 * math.sin((q.is_first_person ? 1.0 : 0.5) * variable.attack_time * 112.0), -7.0, 999.0) * math.sin((q.is_first_person ? 1.0 : 0.5) * variable.attack_time * 112.0) * (1.0 - math.pow(1.0 - variable.attack_time, 3.0))",
-                                    "math.sin((q.is_first_person ? 1.0 : 0.5) * (1.0 - variable.attack_time) * (1.0 - variable.attack_time) * 200.0) * 7.5 * (1.0 - math.pow(1.0 - variable.attack_time, 2.5)) - (q.is_first_person ? 1.0 : 0.5) * variable.attack_time * 15.0 * (1.0 - math.pow(1.0 - variable.attack_time, 3.0)) + variable.short_arm_offset_right",
-                                    "math.sin((q.is_first_person ? 1.0 : 0.5) * variable.attack_time * 120.0) * 1.75 * (1.0 - math.pow(1.0 - variable.attack_time, 2.0))"
+                                    "math.sin(variable.attack_time * 180.0) * -12.0",
+                                    "math.sin((1.0 - variable.attack_time) * (1.0 - variable.attack_time) * 200.0) * 8.0 - variable.attack_time * 10.0",
+                                    "math.sin(variable.attack_time * 150.0) * 3.0"
                                 ],
                                 "rotation": [
-                                    "math.sin((q.is_first_person ? 1.0 : 0.5) * (1.0 - variable.attack_time) * (1.0 - variable.attack_time) * 280.0) * (q.equipped_item_is_attachable('main_hand') ? -30.0 : -60.0) * (1.0 - math.pow(1.0 - variable.attack_time, 2.0))",
-                                    "math.sin((q.is_first_person ? 1.0 : 0.5) * (1.0 - variable.attack_time) * (1.0 - variable.attack_time) * 280.0) * (q.equipped_item_is_attachable('main_hand') ? 75.0 : 40.0) * (1.0 - math.pow(1.0 - variable.attack_time, 2.0))",
-                                    "math.sin((q.is_first_person ? 1.0 : 0.5) * (1.0 - variable.attack_time) * (1.0 - variable.attack_time) * 280.0) * (q.equipped_item_is_attachable('main_hand') ? -25.0 : 20.0) * (1.0 - math.pow(1.0 - variable.attack_time, 2.0))"
+                                    "math.sin((1.0 - variable.attack_time) * (1.0 - variable.attack_time) * 250.0) * -50.0",
+                                    "math.sin((1.0 - variable.attack_time) * (1.0 - variable.attack_time) * 250.0) * 80.0",
+                                    "math.sin((1.0 - variable.attack_time) * (1.0 - variable.attack_time) * 250.0) * -30.0"
                                 ]
                             }
-                        },
-                        "loop": True
+                        }
+                    },
+                    "animation.player.first_person.vr_attack_rotation": {
+                        "loop": True,
+                        "bones": {
+                            "rightarm": {
+                                "position": [
+                                    "6.0 * math.sin(variable.attack_time * 130.0)",
+                                    "(math.sin((1.0 - variable.attack_time) * (1.0 - variable.attack_time) * 190.0) - 0.7) * 9.0 + 5.0",
+                                    "math.sin(variable.attack_time * 130.0) * 14.0"
+                                ],
+                                "rotation": [
+                                    "32.0 * math.sin(variable.attack_time * -170.0 - 45.0) * 1.4",
+                                    "15.0 * math.sin(variable.attack_time * 160.0)",
+                                    "28.0 * math.sin(variable.attack_time * 190.0 + 25.0) * 1.3"
+                                ]
+                            }
+                        }
                     }
                 }
             }
