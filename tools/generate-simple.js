@@ -752,8 +752,9 @@ async function generateIcon(page, modelPath, outputPath) {
         // Remove isolated pixels (noise cleanup) - remove clusters smaller than 3 pixels
         imageBuffer = await removeIsolatedPixels(imageBuffer, 3);
         
-        // Convert to 8-bit PNG with alpha (60-80% smaller)
+        // Resize to 64x64 and convert to 8-bit PNG with alpha
         await sharp(imageBuffer)
+            .resize(64, 64, { kernel: 'lanczos3' })
             .png({ 
                 compressionLevel: 9,
                 palette: true,

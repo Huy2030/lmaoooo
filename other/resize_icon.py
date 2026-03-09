@@ -38,7 +38,7 @@ def resize_icons():
                                 continue
                             
                             # Resize 128x128 to 48x48
-                            if size == (128, 128):
+                            if size == (64, 64):
                                 # Convert to RGBA if needed
                                 if img.mode != 'RGBA':
                                     img = img.convert('RGBA')
