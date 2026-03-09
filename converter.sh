@@ -1353,7 +1353,7 @@ jq '
       + (if .item == "bow" then {"tags": ["geyser_custom:custom_bow"]} 
           elif .item == "crossbow" then {"tags": ["geyser_custom:custom_crossbow"]} 
           elif .item == "shield" then {"tags": ["geyser_custom:custom_shield"]}
-          elif ((.item | test("helmet|chestplate|leggings|boots"))) then { "render_offsets": { "main_hand": { "first_person": { "scale": { "x": 0.02, "y": 0.02, "z": 0.02 } }, "third_person": { "scale": { "x": 0.05, "y": 0.05, "z": 0.05 } } }, "off_hand": { "first_person": { "scale": { "x": 0.02, "y": 0.02, "z": 0.02 } }, "third_person": { "scale": { "x": 0.05, "y": 0.05, "z": 0.05 } } } } } else {} end)
+          else {} end)
     ]
   }
 ) 
