@@ -43,13 +43,10 @@ def resize_icons():
                             if size == (64, 64):
                                 os.remove(png_file)
                                 total_deleted += 1
-                                print(f"  Đã xóa: {file}")
                                 continue
                             
                             # Resize 128x128 to 48x48
                             if size == (128, 128):
-                                print(f"  Đang resize: {file} từ {size} → 48x48")
-                                
                                 # Convert to RGBA if needed (fix "wrong mode" error)
                                 if img.mode != 'RGBA':
                                     img = img.convert('RGBA')
@@ -58,9 +55,15 @@ def resize_icons():
                                 blurred = img.filter(ImageFilter.GaussianBlur(radius=0.7))
                                 # Resize with high quality
                                 resized = blurred.resize((48, 48), Image.LANCZOS)
-                                resized.save(png_file, 'PNG')
+                                
+                                # Optimize: Convert to P mode (palette/indexed color) to reduce file size
+                                # This is similar to generate-simple.js palette optimization
+                                # Convert RGBA -> P with adaptive palette (up to 256 colors)
+                                resized = resized.convert('P', palette=Image.ADAPTIVE, colors=256)
+                                
+                                # Save with maximum compression
+                                resized.save(png_file, 'PNG', optimize=True, compress_level=9)
                                 total_resized += 1
-                                print(f"  ✓ Đã resize: {file}")
                     except Exception as e:
                         total_errors += 1
                         print(f"  ✗ Lỗi khi xử lý {file}: {e}")
