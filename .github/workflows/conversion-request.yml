@@ -267,11 +267,14 @@ jobs:
           ENCRYPT_PACK: ${{ needs.get-pack-info.outputs.encrypt_pack }}
         run: |
           mkdir -p staging
-          cp -r *.py staging/
-          cp -r other staging/
-          cp -r animations staging/
-          cp -r tools staging/
+          mkdir -p staging/other
           cp converter.sh staging/
+          cp *.py staging/
+          cp other/*.py staging/other/
+          mkdir -p staging/animations
+          cp animations/anim_2d.py staging/animations/
+          mkdir -p staging/tools
+          cp -r tools/* staging/tools/
           cd staging
           chmod +x converter.sh
           COLUMNS=$COLUMNS-1 curl --no-styled-output -#L -o input_pack.zip "${PACK_URL}"
