@@ -1,16 +1,6 @@
 import os
 from PIL import Image, ImageFilter
 import glob
-import sys
-
-# Debug: Print where this script is being called from
-if __name__ == "__main__":
-    print(f"=== RESIZE_ICON.PY DEBUG ===")
-    print(f"Current working directory: {os.getcwd()}")
-    print(f"Script location: {os.path.abspath(__file__)}")
-    print(f"Python executable: {sys.executable}")
-    print(f"Command line args: {sys.argv}")
-    print("=" * 50)
 
 def resize_icons():
     """Resize tất cả icon 128x128 xuống 48x48 với độ mờ nhẹ và xóa icon 64x64"""
@@ -71,27 +61,22 @@ def resize_icons():
     print(f"Deleted {total_deleted} icons (64x64)")
 
 if __name__ == "__main__":
-    import traceback
     import sys
+    import traceback
     
-    # Get the parent process info
+    # Log chi tiết để debug
     cwd = os.getcwd()
-    
-    print(f"=== RESIZE_ICON.PY DEBUG ===")
-    print(f"Current working directory: {cwd}")
-    print(f"Script location: {os.path.abspath(__file__)}")
-    print(f"Python executable: {sys.executable}")
-    print(f"Command line args: {sys.argv}")
-    print("=" * 50)
-    print("resize_icon.py called directly")
-    print("Call stack:")
-    traceback.print_stack()
+    print(f"[RESIZE_ICON] Được gọi từ thư mục: {cwd}")
+    print(f"[RESIZE_ICON] Call stack:")
+    for line in traceback.format_stack()[:-1]:
+        print(line.strip())
     
     # Only run if called from staging directory (from free.py)
     # Skip if called from root directory (premature call)
     if not cwd.endswith('staging') and 'staging' not in cwd:
-        print("WARNING: resize_icon.py called from wrong directory, skipping...")
-        print(f"Expected to be called from 'staging' directory, but current dir is: {cwd}")
+        print("[RESIZE_ICON] ⚠️ Bỏ qua - chưa đến thời điểm chạy (đang ở thư mục gốc)")
         sys.exit(0)
     
+    print("[RESIZE_ICON] ✓ Bắt đầu resize icons...")
     resize_icons()
+    print("[RESIZE_ICON] ✓ Hoàn thành resize icons")

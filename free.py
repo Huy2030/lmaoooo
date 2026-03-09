@@ -1,6 +1,6 @@
 import zipfile, os, subprocess
 
-print("=== FREE.PY STARTED ===")
+print("=== FREE.PY: Bắt đầu chuyển đổi FREE ===")
 
 with zipfile.ZipFile("staging/input_pack.zip", "r") as file:
     file.extractall("pack/")
@@ -115,7 +115,7 @@ try:
             # Resize icons after copying
             try:
                 print("Running resize_icon.py...")
-                result = subprocess.run(["python", "other/resize_icon.py"], text=True)
+                result = subprocess.run(["python", "other/resize_icon.py"], text=True, capture_output=False)
                 print("Icons resize completed")
             except Exception as e: 
                 print(f"Error running resize_icon: {e}")
