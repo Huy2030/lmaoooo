@@ -46,25 +46,25 @@ jobs:
       - name: Parse Issue Body
         id: parse-body
         run: |
-          cat << 'EOF' > issue_body.txt
-          ${{ github.event.issue.body }}
-          EOF
-          
-          if grep -A 2 "All Items Conversion" issue_body.txt | grep -q "true"; then
-            echo "ALL_ITEMS=true" >> $GITHUB_OUTPUT
-          else
-            echo "ALL_ITEMS=false" >> $GITHUB_OUTPUT
-          fi
-          
-          if grep -A 2 "Conversion Mappings V2" issue_body.txt | grep -q "true"; then
+          # Check title for V2
+          ISSUE_TITLE="${{ github.event.issue.title }}"
+          if echo "$ISSUE_TITLE" | grep -qi "V2"; then
             echo "ITEM_MODEL=true" >> $GITHUB_OUTPUT
+            echo "DEBUG: Found V2 in title, enabling item_model"
           else
             echo "ITEM_MODEL=false" >> $GITHUB_OUTPUT
+            echo "DEBUG: V2 not found in title, disabling item_model"
           fi
       - name: Organize Inputs
         id: organize-inputs
         run: |
-          echo ${{ toJSON(steps.parse-issue.outputs.data) }} | jq '
+          cat <<'JSON' > raw.json
+          ${{ toJSON(steps.parse-issue.outputs.data) }}
+          JSON
+          
+          cat raw.json | jq -r '.' > parsed.json
+          
+          jq '
           def test_input($input; $default):
           if ($input == "*No response*" or $input == "None" or $input == "null") then $default else ($input | tostring | gsub("\\\\";""))  end;
           
@@ -103,12 +103,18 @@ jobs:
             "item_model": (if (.["itemmodel"].text | tostring) == "true" then "true" else "false" end),
             "json_unicode_conversion": test_input(.["json-unicode-conversion"].text; "false"),
             "encrypt_pack": test_input(.["encrypt-pack"].text; "false")
-          }' > inputs.json
+          }' parsed.json > inputs.json
           
-          # Override with direct parse from issue body
+          # Override with direct parse from title
           ITEM_MODEL_DIRECT="${{ steps.parse-body.outputs.ITEM_MODEL }}"
+          echo "DEBUG: ITEM_MODEL_DIRECT = $ITEM_MODEL_DIRECT"
           if [ "$ITEM_MODEL_DIRECT" == "true" ]; then
+            echo "DEBUG: Setting item_model to true"
             jq '.item_model = "true"' inputs.json > inputs_temp.json
+            mv inputs_temp.json inputs.json
+          elif [ "$ITEM_MODEL_DIRECT" == "false" ]; then
+            echo "DEBUG: Setting item_model to false"
+            jq '.item_model = "false"' inputs.json > inputs_temp.json
             mv inputs_temp.json inputs.json
           fi
           
@@ -231,6 +237,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_ISSUE_TITLE: ${{ github.event.issue.title }}
           PACK_URL: ${{ needs.get-pack-info.outputs.pack_url }}
           DEFAULT_PACK_URL: ${{ needs.get-pack-info.outputs.default_pack_url }}
           MERGE_PACK_URL: ${{ needs.get-pack-info.outputs.merge_pack_url }}
@@ -260,14 +267,11 @@ jobs:
           ENCRYPT_PACK: ${{ needs.get-pack-info.outputs.encrypt_pack }}
         run: |
           mkdir -p staging
-          mkdir -p staging/other
+          cp -r *.py staging/
+          cp -r other staging/
+          cp -r animations staging/
+          cp -r tools staging/
           cp converter.sh staging/
-          cp *.py staging/
-          cp other/*.py staging/other/
-          mkdir -p staging/animations
-          cp animations/anim_2d.py staging/animations/
-          mkdir -p staging/tools
-          cp -r tools/* staging/tools/
           cd staging
           chmod +x converter.sh
           COLUMNS=$COLUMNS-1 curl --no-styled-output -#L -o input_pack.zip "${PACK_URL}"
@@ -278,16 +282,17 @@ jobs:
           fi
           ./converter.sh input_pack.zip -w "false" -m ${MERGE_PACK_FILE} -a ${ATTACHABLE_MATERIAL} -b ${BLOCK_MATERIAL} -f ${DEFAULT_PACK_URL} -v ${DEFAULT_ASSETS_VERSION} -r ${RENAME_MODEL_FILES} -s ${ARCHIVE_SCRATCH}
           
-          # Encryption after conversion
-          if [ "${ENCRYPT_PACK}" = "true" ]; then
-            python other/encrypt.py bedrock.mcpack bedrock_encrypted.mcpack || exit 1
-            if [ -f "bedrock_encrypted.mcpack" ]; then
-              rm -f bedrock.mcpack
-              mv bedrock_encrypted.mcpack bedrock.mcpack
-              mv bedrock_encrypted_key.txt bedrock.mcpack.key
-            else
-              exit 1
-            fi
+          # Encryption after conversion (always enabled)
+          echo "Encrypting pack..."
+          python other/encrypt.py bedrock.mcpack bedrock_encrypted.mcpack || exit 1
+          if [ -f "bedrock_encrypted.mcpack" ]; then
+            rm -f bedrock.mcpack
+            mv bedrock_encrypted.mcpack bedrock.mcpack
+            mv bedrock_encrypted_key.txt bedrock.mcpack.key
+            echo "Pack encrypted successfully"
+          else
+            echo "Encryption failed"
+            exit 1
           fi
       - name: Upload converted pack
         uses: actions/upload-artifact@v4
@@ -296,7 +301,6 @@ jobs:
           path: |
             staging/bedrock.mcpack
             staging/bedrock.mcpack.key
-            staging/bedrock/
             staging/*.json
       - name: Delete generated-icons artifact
         uses: geekyeggo/delete-artifact@v5
