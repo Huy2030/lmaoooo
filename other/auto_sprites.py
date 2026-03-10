@@ -131,17 +131,49 @@ def main():
             texture_path = value["textures"]
             original_path = texture_path
             
-            # Fix pattern 1: /segment/segment/ (single segment duplicate)
-            pattern1 = r'/([^/]+)/\1/'
-            while re.search(pattern1, texture_path):
-                texture_path = re.sub(pattern1, r'/\1/', texture_path)
+            # Kiểm tra đường dẫn Java trước khi fix
+            should_fix = False
             
-            # Fix pattern 2: /segment1/segment2/segment1/segment2/ (two segments duplicate)
-            pattern2 = r'/([^/]+)/([^/]+)/\1/\2/'
-            while re.search(pattern2, texture_path):
-                texture_path = re.sub(pattern2, r'/\1/\2/', texture_path)
+            # Chuyển đổi texture path thành Java path để kiểm tra
+            # textures/emberedweaponry2/emberedweaponry2/irithyllblade → pack/assets/emberedweaponry2/models/emberedweaponry2/irithyllblade.json
+            if texture_path.startswith("textures/"):
+                java_path_parts = texture_path.replace("textures/", "").split("/")
+                if len(java_path_parts) >= 2:
+                    namespace = java_path_parts[0]
+                    remaining_path = "/".join(java_path_parts[1:])
+                    java_path = f"pack/assets/{namespace}/models/{remaining_path}.json"
+                    
+                    # Kiểm tra xem file Java có tồn tại không
+                    if os.path.exists(java_path):
+                        # File tồn tại, đường dẫn đúng, không cần fix
+                        should_fix = False
+                    else:
+                        # File không tồn tại, có thể bị duplicate path, cần kiểm tra path đã fix
+                        # Fix pattern 1: /segment/segment/ (single segment duplicate)
+                        fixed_path = texture_path
+                        pattern1 = r'/([^/]+)/\1/'
+                        while re.search(pattern1, fixed_path):
+                            fixed_path = re.sub(pattern1, r'/\1/', fixed_path)
+                        
+                        # Fix pattern 2: /segment1/segment2/segment1/segment2/ (two segments duplicate)
+                        pattern2 = r'/([^/]+)/([^/]+)/\1/\2/'
+                        while re.search(pattern2, fixed_path):
+                            fixed_path = re.sub(pattern2, r'/\1/\2/', fixed_path)
+                        
+                        # Kiểm tra path đã fix có tồn tại trong Java không
+                        if fixed_path != texture_path:
+                            fixed_java_parts = fixed_path.replace("textures/", "").split("/")
+                            if len(fixed_java_parts) >= 2:
+                                fixed_namespace = fixed_java_parts[0]
+                                fixed_remaining = "/".join(fixed_java_parts[1:])
+                                fixed_java_path = f"pack/assets/{fixed_namespace}/models/{fixed_remaining}.json"
+                                
+                                if os.path.exists(fixed_java_path):
+                                    # Path đã fix tồn tại trong Java, cần fix
+                                    should_fix = True
+                                    texture_path = fixed_path
             
-            if texture_path != original_path:
+            if should_fix and texture_path != original_path:
                 value["textures"] = texture_path
                 print(f"🔧 Fixed duplicate path: {original_path} → {texture_path}")
     

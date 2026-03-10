@@ -3,7 +3,7 @@ from PIL import Image, ImageFilter
 import glob
 
 def resize_icons():
-    """Resize tất cả icon 128x128 xuống 48x48 và xóa icon 64x64"""
+    """Resize tất cả icon 128x128 xuống 32x32"""
     target_dirs = [
         "staging/target/rp/textures",
         "bedrock/textures"
@@ -12,7 +12,6 @@ def resize_icons():
     skip_folder = "campfire_item"
     
     total_resized = 0
-    total_deleted = 0
     
     for target_dir in target_dirs:
         if not os.path.exists(target_dir):
@@ -31,13 +30,7 @@ def resize_icons():
                         with Image.open(png_file) as img:
                             size = img.size
                             
-                            # Delete 64x64 icons
-                            if size == (64, 64):
-                                os.remove(png_file)
-                                total_deleted += 1
-                                continue
-                            
-                            # Resize 128x128 to 48x48
+                            # Resize 128x128 to 32x32
                             if size == (128, 128):
                                 # Convert to RGBA if needed
                                 if img.mode != 'RGBA':
