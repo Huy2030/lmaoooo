@@ -305,6 +305,7 @@ jobs:
           path: |
             staging/bedrock.mcpack
             staging/bedrock.mcpack.key
+            staging/bedrock
             staging/*.json
       - name: Delete generated-icons artifact
         uses: geekyeggo/delete-artifact@v5

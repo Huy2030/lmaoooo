@@ -40,7 +40,7 @@ def randomize_item_textures():
     folders_to_rename = []  # [(abs_path, relative_path)]
     
     # Danh sách thư mục bỏ qua
-    skip_folders = ['gui', 'campfire_item']
+    skip_folders = ['gui', 'campfire_item', 'item']
     
     for root, dirs, files in os.walk(textures_root):
         # Lọc bỏ thư mục cần skip
@@ -276,7 +276,7 @@ def check_randomized():
         "staging/target/rp/animation_controllers"
     ]
     
-    skip_folders = ['gui', 'campfire_item']
+    skip_folders = ['gui', 'campfire_item', 'item']
     
     for directory in dirs:
         if os.path.exists(directory):
