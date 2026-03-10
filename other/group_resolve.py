@@ -30,7 +30,7 @@ def resolve_groups():
     
     for json_file in models_dir.rglob("*.json"):
         # Bỏ qua campfire_block.json và campfire_tool_custom.json
-        if json_file.name in ["campfire_block.json", "campfire_tool_custom.json"]:
+        if json_file.name in ["campfire_block.json", "campfire_tool_custom.json", "plaiiqhdbbbcassyay.geo.json"]:
             continue
             
         try:

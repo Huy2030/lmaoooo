@@ -114,7 +114,6 @@ except Exception as e:
     pass
 
 try:
-    result3 = subprocess.run(["python", "other/merge_models.py"], capture_output=True, text=True)
     result4 = subprocess.run(["python", "other/attachables_dupe.py"], capture_output=True, text=True)
     result5 = subprocess.run(["python", "other/directory_confusion.py"], capture_output=True, text=True)
     result6 = subprocess.run(["python", "other/random_name.py"], capture_output=True, text=True)

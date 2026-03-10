@@ -244,27 +244,106 @@ def rename_json_files():
         "staging/target/rp/animation_controllers"
     ]
     
+    # Danh sách thư mục cần tạo thư mục con trước khi xáo trộn
+    dirs_need_subfolders = [
+        "staging/target/rp/animations",
+        "staging/target/rp/render_controllers",
+        "staging/target/rp/animation_controllers"
+    ]
+    
     for directory in directories:
-        if os.path.exists(directory):
-            # Random tên file JSON
-            json_files = list(glob.glob(f"{directory}/**/*.json", recursive=True))
+        if not os.path.exists(directory):
+            continue
+        
+        # Bước 1: Random tên file JSON
+        json_files = list(glob.glob(f"{directory}/**/*.json", recursive=True))
+        
+        for json_file in json_files:
+            dir_path = os.path.dirname(json_file)
+            new_name = f"{random_name()}.json"
+            new_path = os.path.join(dir_path, new_name)
+            os.rename(json_file, new_path)
+        
+        # Bước 2: Random tên thư mục con (chỉ với attachables và models/entity)
+        if directory in ["staging/target/rp/attachables", "staging/target/rp/models/entity"]:
+            folders = []
+            for root, dirs, files in os.walk(directory, topdown=False):
+                for dir_name in dirs:
+                    folders.append(os.path.join(root, dir_name))
             
-            for json_file in json_files:
-                dir_path = os.path.dirname(json_file)
-                new_name = f"{random_name()}.json"
-                new_path = os.path.join(dir_path, new_name)
-                os.rename(json_file, new_path)
+            for old_dir_path in folders:
+                new_dir_path = os.path.join(os.path.dirname(old_dir_path), random_folder_name())
+                os.rename(old_dir_path, new_dir_path)
+        
+        # Bước 3: Xáo trộn file JSON
+        # Thu thập lại tất cả file JSON sau khi rename
+        json_files_after_rename = list(glob.glob(f"{directory}/**/*.json", recursive=True))
+        
+        if directory in dirs_need_subfolders:
+            # Tạo 2-5 thư mục con ngẫu nhiên
+            num_folders = random.randint(2, 5)
+            created_dirs = []
             
-            # Random tên thư mục con (với attachables, models/entity, và animations)
-            if directory in ["staging/target/rp/attachables", "staging/target/rp/models/entity", "staging/target/rp/animations"]:
-                folders = []
-                for root, dirs, files in os.walk(directory, topdown=False):
-                    for dir_name in dirs:
-                        folders.append(os.path.join(root, dir_name))
-                
-                for old_dir_path in folders:
-                    new_dir_path = os.path.join(os.path.dirname(old_dir_path), random_folder_name())
-                    os.rename(old_dir_path, new_dir_path)
+            for _ in range(num_folders):
+                folder_name = random_folder_name()
+                folder_path = os.path.join(directory, folder_name)
+                os.makedirs(folder_path, exist_ok=True)
+                created_dirs.append(folder_path)
+            
+            # Thu thập tất cả thư mục con (bao gồm cả thư mục vừa tạo và thư mục có sẵn)
+            all_dirs = created_dirs.copy()
+            for root, dirs, files in os.walk(directory):
+                if root != directory:
+                    for d in dirs:
+                        dir_path = os.path.join(root, d)
+                        if dir_path not in all_dirs:
+                            all_dirs.append(dir_path)
+            
+            # Nếu không có thư mục con nào, chỉ dùng thư mục vừa tạo
+            if not all_dirs:
+                all_dirs = created_dirs
+            
+            # Xáo trộn 100% file vào các thư mục con
+            for json_file in json_files_after_rename:
+                if all_dirs:
+                    target_dir = random.choice(all_dirs)
+                    new_path = os.path.join(target_dir, os.path.basename(json_file))
+                    
+                    # Nếu file đã tồn tại, thêm suffix số
+                    if os.path.exists(new_path):
+                        base_name = os.path.splitext(os.path.basename(json_file))[0]
+                        counter = 1
+                        while os.path.exists(new_path):
+                            new_name = f"{base_name}_{counter}.json"
+                            new_path = os.path.join(target_dir, new_name)
+                            counter += 1
+                    
+                    shutil.move(json_file, new_path)
+        
+        else:
+            # Với attachables và models/entity: xáo trộn giữa các thư mục có sẵn
+            # Thu thập tất cả thư mục con
+            all_dirs = []
+            for root, dirs, files in os.walk(directory):
+                if root != directory:
+                    all_dirs.append(root)
+            
+            # Nếu có thư mục con, xáo trộn file
+            if all_dirs:
+                for json_file in json_files_after_rename:
+                    target_dir = random.choice(all_dirs)
+                    new_path = os.path.join(target_dir, os.path.basename(json_file))
+                    
+                    # Nếu file đã tồn tại, thêm suffix số
+                    if os.path.exists(new_path):
+                        base_name = os.path.splitext(os.path.basename(json_file))[0]
+                        counter = 1
+                        while os.path.exists(new_path):
+                            new_name = f"{base_name}_{counter}.json"
+                            new_path = os.path.join(target_dir, new_name)
+                            counter += 1
+                    
+                    shutil.move(json_file, new_path)
 
 def check_randomized():
     """Kiểm tra xem tất cả file JSON và thư mục đã có prefix campfire_ chưa"""
@@ -285,7 +364,7 @@ def check_randomized():
                     print(f"[DEBUG] File chưa random: {json_file}")
                     return False
             
-            if directory in ["staging/target/rp/attachables", "staging/target/rp/models/entity", "staging/target/rp/animations"]:
+            if directory in ["staging/target/rp/attachables", "staging/target/rp/models/entity"]:
                 for root, dirs_list, files in os.walk(directory):
                     for dir_name in dirs_list:
                         if not dir_name.startswith("campfire_"):
