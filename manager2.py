@@ -12,13 +12,6 @@ try:
 except Exception as e:
     pass
 
-if is_animate_conversion:
-    try:
-        result = subprocess.run(["python", "frame.py"], text=True)
-    except Exception as e:
-        pass
-    exit(0)
-
 is_free_conversion = False
 try:
     issue_title = os.environ.get('GITHUB_ISSUE_TITLE', '').upper()
@@ -79,6 +72,13 @@ else:
     except Exception as e: pass
     try:
         import sound
+    except Exception as e: pass
+    try:
+        if is_animate_conversion:
+            import sys
+            sys.path.insert(0, 'animations')
+            import anim_2d
+            anim_2d.scan_2d_animations()
     except Exception as e: pass
     try:
         result = subprocess.run(["python", "other/gui.py"], capture_output=True, text=True)
