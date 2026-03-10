@@ -3,21 +3,34 @@ import zipfile, os, subprocess
 with zipfile.ZipFile("staging/input_pack.zip", "r") as file:
     file.extractall("pack/")
 
-is_free_conversion = False
+is_animate_conversion = False
 try:
     issue_title = os.environ.get('GITHUB_ISSUE_TITLE', '').upper()
     print(f"DEBUG: Issue title = '{issue_title}'")
+    if '[ANIMATE]' in issue_title:
+        is_animate_conversion = True
+except Exception as e:
+    pass
+
+if is_animate_conversion:
+    try:
+        result = subprocess.run(["python", "frame.py"], text=True)
+    except Exception as e:
+        pass
+    exit(0)
+
+is_free_conversion = False
+try:
+    issue_title = os.environ.get('GITHUB_ISSUE_TITLE', '').upper()
     if '[FREE]' in issue_title:
         is_free_conversion = True
 except Exception as e:
     pass
+
 if is_free_conversion:
     try:
-        print("Running free.py for FREE conversion...")
         result = subprocess.run(["python", "free.py"], text=True)
-        print("Free conversion completed")
     except Exception as e:
-        print(f"Error in free.py: {e}")
         pass
     exit(0)
 offhand_enabled = False
