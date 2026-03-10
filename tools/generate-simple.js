@@ -784,21 +784,21 @@ async function generateBlockIcons(page) {
         return;
     }
     
-    // Tìm bedrock root
-    const possibleBedrockPaths = [
-        path.join(__dirname, '../staging/target/rp'),
-        path.join(__dirname, '../../staging/target/rp')
+    // Tìm pack assets root
+    const possibleAssetsPaths = [
+        path.join(__dirname, '../pack/assets'),
+        path.join(__dirname, '../../pack/assets')
     ];
     
-    let bedrockRoot = null;
-    for (const testPath of possibleBedrockPaths) {
+    let assetsRoot = null;
+    for (const testPath of possibleAssetsPaths) {
         if (fs.existsSync(testPath)) {
-            bedrockRoot = testPath;
+            assetsRoot = testPath;
             break;
         }
     }
     
-    if (!bedrockRoot) {
+    if (!assetsRoot) {
         return;
     }
     
@@ -810,8 +810,7 @@ async function generateBlockIcons(page) {
         return;
     }
     
-    // Thu thập tất cả models từ các blockstate files
-    const models = [];
+    let success = 0, skipped = 0;
     
     for (const blockstateFile of blockstateFiles) {
         const blockstatePath = path.join(blockstatesDir, blockstateFile);
@@ -820,128 +819,129 @@ async function generateBlockIcons(page) {
         try {
             const blockstateData = JSON.parse(fs.readFileSync(blockstatePath, 'utf-8'));
             
-            if (blockstateData.variants) {
-                for (const [variant, data] of Object.entries(blockstateData.variants)) {
-                    if (data.model && !data.model.startsWith('block/') && !data.model.startsWith('minecraft:')) {
-                        models.push({ 
-                            blockName,
-                            variant, 
-                            modelPath: data.model 
-                        });
+            if (!blockstateData.variants) {
+                continue;
+            }
+            
+            // Xử lý từng variant
+            for (const [variant, data] of Object.entries(blockstateData.variants)) {
+                if (!data.model) {
+                    continue;
+                }
+                
+                const modelPath = data.model;
+                
+                // Bỏ qua vanilla models
+                if (modelPath.startsWith('block/') || modelPath.startsWith('minecraft:')) {
+                    continue;
+                }
+                
+                // Parse namespace:path (ví dụ: fuben:item/ia_auto/fb_block_2)
+                let namespace = 'minecraft';
+                let relativePath = modelPath;
+                if (modelPath.includes(':')) {
+                    [namespace, relativePath] = modelPath.split(':');
+                }
+                
+                // Tìm model JSON file: pack/assets/fuben/models/item/ia_auto/fb_block_2.json
+                const modelJsonPath = path.join(assetsRoot, namespace, 'models', relativePath + '.json');
+                
+                if (!fs.existsSync(modelJsonPath)) {
+                    skipped++;
+                    continue;
+                }
+                
+                // Đọc model JSON
+                const modelData = JSON.parse(fs.readFileSync(modelJsonPath, 'utf-8'));
+                
+                // Chỉ xử lý blocks có parent (block 16x16x16), bỏ qua block 3D
+                if (!modelData.parent) {
+                    skipped++;
+                    continue;
+                }
+                
+                if (!modelData.textures) {
+                    skipped++;
+                    continue;
+                }
+                
+                // Lấy texture path từ "all" hoặc "particle"
+                let texturePath = modelData.textures.all || modelData.textures.particle;
+                if (!texturePath) {
+                    skipped++;
+                    continue;
+                }
+                
+                // Parse texture path (ví dụ: fuben:block/block/block_2)
+                let textureNamespace = 'minecraft';
+                let textureRelativePath = texturePath;
+                if (texturePath.includes(':')) {
+                    [textureNamespace, textureRelativePath] = texturePath.split(':');
+                }
+                
+                // Tìm texture PNG: pack/assets/fuben/textures/block/block/block_2.png
+                const texturePngPath = path.join(assetsRoot, textureNamespace, 'textures', textureRelativePath + '.png');
+                
+                if (!fs.existsSync(texturePngPath)) {
+                    skipped++;
+                    continue;
+                }
+                
+                // Tạo output path từ model path
+                // fuben:item/ia_auto/fb_block_2 → fuben/item/ia_auto/fb_block_2.png
+                const outputRelativePath = modelPath.replace(':', '/');
+                const outputPath = path.join(CONFIG.outputDir, 'textures', outputRelativePath + '.png');
+                
+                // Tạo thư mục nếu cần
+                const outputDir = path.dirname(outputPath);
+                if (!fs.existsSync(outputDir)) {
+                    fs.mkdirSync(outputDir, { recursive: true });
+                }
+                
+                // Tạo block model 3D từ texture
+                const blockModel = {
+                    credit: "Made with Blockbench",
+                    elements: [{
+                        name: "blocks",
+                        from: [0, 0, 0],
+                        to: [16, 16, 16],
+                        rotation: { angle: 0, axis: "y", origin: [8, 0, 8] },
+                        color: 3,
+                        faces: {
+                            north: { uv: [0, 0, 16, 16], texture: "#0" },
+                            east: { uv: [0, 0, 16, 16], texture: "#0" },
+                            south: { uv: [0, 0, 16, 16], texture: "#0" },
+                            west: { uv: [0, 0, 16, 16], texture: "#0" },
+                            up: { uv: [0, 0, 16, 16], texture: "#0" },
+                            down: { uv: [0, 0, 16, 16], texture: "#0" }
+                        }
+                    }],
+                    textures: {
+                        "0": "block_texture"
+                    },
+                    display: {
+                        gui: {
+                            rotation: [30, -135, 0],
+                            scale: [0.625, 0.625, 0.625]
+                        }
                     }
+                };
+                
+                try {
+                    // Generate block icon
+                    const result = await generateBlockIcon(page, blockModel, texturePngPath, outputPath);
+                    if (result) {
+                        success++;
+                    } else {
+                        skipped++;
+                    }
+                } catch (error) {
+                    skipped++;
                 }
             }
         } catch (error) {
             // Skip on error
-        }
-    }
-    
-    if (models.length === 0) {
-        return;
-    }
-    
-    let success = 0, skipped = 0;
-    
-    for (const { blockName, variant, modelPath } of models) {
-        // Parse namespace:path
-        let namespace = 'minecraft';
-        let relativePath = modelPath;
-        if (modelPath.includes(':')) {
-            [namespace, relativePath] = modelPath.split(':');
-        }
-        
-        // Find attachable
-        const attachablePath = path.join(bedrockRoot, 'attachables', namespace, relativePath + '.json');
-        
-        if (!fs.existsSync(attachablePath)) {
-            skipped++;
             continue;
-        }
-        
-        // Read attachable
-        const attachableData = JSON.parse(fs.readFileSync(attachablePath, 'utf-8'));
-        const description = attachableData['minecraft:attachable']?.description;
-        
-        if (!description) {
-            skipped++;
-            continue;
-        }
-        
-        const geometry = description.geometry?.default;
-        
-        // CHỈ XỬ LÝ geometry.campfire_block
-        if (geometry !== 'geometry.campfire_block') {
-            skipped++;
-            continue;
-        }
-        
-        const textureDefault = description.textures?.default;
-        if (!textureDefault) {
-            skipped++;
-            continue;
-        }
-        
-        // Find texture
-        const cleanPath = textureDefault.replace(/^textures\//, '');
-        const texturePath = path.join(bedrockRoot, 'textures', cleanPath + '.png');
-        
-        if (!fs.existsSync(texturePath)) {
-            skipped++;
-            continue;
-        }
-        
-        // Create block model JSON
-        const blockModel = {
-            credit: "Made with Blockbench",
-            elements: [{
-                name: "blocks",
-                from: [0, 0, 0],
-                to: [16, 16, 16],
-                rotation: { angle: 0, axis: "y", origin: [8, 0, 8] },
-                color: 3,
-                faces: {
-                    north: { uv: [0, 0, 16, 16], texture: "#0" },
-                    east: { uv: [0, 0, 16, 16], texture: "#0" },
-                    south: { uv: [0, 0, 16, 16], texture: "#0" },
-                    west: { uv: [0, 0, 16, 16], texture: "#0" },
-                    up: { uv: [0, 0, 16, 16], texture: "#0" },
-                    down: { uv: [0, 0, 16, 16], texture: "#0" }
-                }
-            }],
-            textures: {
-                "0": "block_texture"
-            },
-            display: {
-                gui: {
-                    rotation: [30, -135, 0],
-                    scale: [0.625, 0.625, 0.625]
-                }
-            }
-        };
-        
-        // Create output path based on attachable path
-        // bedrock/attachables/vanilla_expansion_wool/item/ia_auto/orange_quilt.json
-        // -> textures/vanilla_expansion_wool/item/ia_auto/orange_quilt.png
-        const relativeAttachablePath = path.relative(path.join(bedrockRoot, 'attachables'), attachablePath);
-        const outputName = relativeAttachablePath.replace('.json', '.png');
-        const outputPath = path.join(CONFIG.outputDir, 'textures', outputName);
-        
-        // Create directory if needed
-        const outputDir = path.dirname(outputPath);
-        if (!fs.existsSync(outputDir)) {
-            fs.mkdirSync(outputDir, { recursive: true });
-        }
-        
-        try {
-            // Use the existing generateIcon function with our block model
-            const result = await generateBlockIcon(page, blockModel, texturePath, outputPath);
-            if (result) {
-                success++;
-            } else {
-                skipped++;
-            }
-        } catch (error) {
-            skipped++;
         }
     }
 }
@@ -1088,13 +1088,10 @@ async function generateBlockIcon(page, modelData, texturePath, outputPath) {
         const base64Data = result.dataUrl.replace(/^data:image\/png;base64,/, '');
         const imageBuffer = Buffer.from(base64Data, 'base64');
         
-        // Convert to 8-bit PNG with alpha (block icons at 64x64)
+        // Convert to 32-bit RGBA PNG (block icons at 64x64)
         await sharp(imageBuffer)
             .png({ 
-                compressionLevel: 9,
-                palette: true,
-                quality: 100,
-                colors: 256
+                compressionLevel: 9
             })
             .toFile(outputPath);
         
