@@ -1,7 +1,7 @@
 {
   "name": "minecraft-model-icon-generator",
   "version": "1.0.0",
-  "description": "Auto-generate icons from Minecraft models using GitHub Actions",
+  "description": "Auto-generate icons from Minecraft models",
   "type": "module",
   "scripts": {
     "generate-icons": "node generate-simple.js"

@@ -428,7 +428,6 @@ async function generateIcon(page, modelPath, outputPath) {
         const is2DModel = !modelData.elements && modelData.textures && (modelData.textures.layer0 || modelData.textures.layer1);
         
         if (is2DModel) {
-            // Skip 2D flat models
             return false;
         }
         
@@ -1124,12 +1123,61 @@ async function main() {
     
     const modelFiles = findModelFiles(CONFIG.assetsDir);
     
+    if (modelFiles.length === 0) {
+        return;
+    }
+    
     const html = createHTML();
     const server = await createServer(html);
     
     try {
+        // Install Chrome first if in CI environment
+        if (process.env.CI) {
+            try {
+                const { execSync } = await import('child_process');
+                // Try installing regular chrome first, then fallback to headless shell
+                try {
+                    execSync('npx puppeteer browsers install chrome', { stdio: 'inherit' });
+                } catch (chromeErr) {
+                    execSync('npx puppeteer browsers install chrome-headless-shell', { stdio: 'inherit' });
+                }
+            } catch (installErr) {
+                return;
+            }
+        }
+        
+        // Try to find Chrome executable path
+        let executablePath;
+        if (process.env.CI) {
+            // In CI, try common Chrome paths
+            const commonPaths = [
+                '/usr/bin/google-chrome',
+                '/usr/bin/google-chrome-stable',
+                '/usr/bin/chromium-browser',
+                '/usr/bin/chromium'
+            ];
+            
+            const fs = await import('fs');
+            for (const path of commonPaths) {
+                if (fs.default.existsSync(path)) {
+                    executablePath = path;
+                    break;
+                }
+            }
+        }
+        
+        if (!executablePath) {
+            try {
+                const puppeteerModule = await import('puppeteer');
+                executablePath = puppeteerModule.default.executablePath();
+            } catch (pathError) {
+                executablePath = undefined;
+            }
+        }
+        
         const browser = await puppeteer.launch({
             headless: 'shell',
+            executablePath: executablePath,
             args: [
                 '--no-sandbox',
                 '--disable-setuid-sandbox', 
@@ -1217,6 +1265,8 @@ async function main() {
         
         await browser.close();
         
+    } catch (browserError) {
+        // Silent fail
     } finally {
         server.close();
     }
