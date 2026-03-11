@@ -303,7 +303,7 @@ jobs:
       - name: Upload converted pack
         uses: actions/upload-artifact@v4
         with:
-          name: Bedrock
+          name: Bedrock-${{ github.event.issue.number }}
           path: |
             staging/bedrock.mcpack
             staging/bedrock.mcpack.key
