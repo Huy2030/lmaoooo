@@ -42,7 +42,7 @@ jobs:
     steps:
       - name: Issue Forms Body Parser
         id: parse-issue
-        uses: zentered/issue-forms-body-parser@v2.2.0
+        uses: zentered/issue-forms-body-parser@v3.0.0
       - name: Parse Issue Body
         id: parse-body
         run: |
@@ -165,7 +165,7 @@ jobs:
       - name: Install NodeJS
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
       - name: Cache tools node_modules
         uses: actions/cache@v4
         with:
@@ -220,7 +220,7 @@ jobs:
       - name: Install NodeJS
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
       - name: Install Python
         uses: actions/setup-python@v5
         with:
