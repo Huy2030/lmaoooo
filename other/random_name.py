@@ -378,8 +378,8 @@ def rename_json_files():
             new_path = os.path.join(dir_path, new_name)
             os.rename(json_file, new_path)
         
-        # Bước 2: Random tên thư mục con (chỉ với attachables và models/entity)
-        if directory in ["staging/target/rp/attachables", "staging/target/rp/models/entity"]:
+        # Bước 2: Random tên thư mục con (bao gồm cả animations)
+        if directory in ["staging/target/rp/attachables", "staging/target/rp/models/entity", "staging/target/rp/animations"]:
             folders = []
             for root, dirs, files in os.walk(directory, topdown=False):
                 for dir_name in dirs:
@@ -390,10 +390,38 @@ def rename_json_files():
                 os.rename(old_dir_path, new_dir_path)
         
         # Bước 3: Xáo trộn file JSON
-        # Thu thập lại tất cả file JSON sau khi rename
+        # Thu thập lại tất cả file JSON sau khi rename folders
         json_files_after_rename = list(glob.glob(f"{directory}/**/*.json", recursive=True))
         
         if directory in dirs_need_subfolders:
+            # Xử lý đặc biệt cho animations: xáo trộn giữa các thư mục có sẵn
+            if directory == "staging/target/rp/animations":
+                # Thu thập tất cả thư mục con
+                all_dirs = []
+                for root, dirs, files in os.walk(directory):
+                    if root != directory:
+                        all_dirs.append(root)
+                
+                # Nếu có thư mục con, xáo trộn file
+                if all_dirs:
+                    for json_file in json_files_after_rename:
+                        target_dir = random.choice(all_dirs)
+                        new_path = os.path.join(target_dir, os.path.basename(json_file))
+                        
+                        # Nếu file đã tồn tại, thêm suffix số
+                        if os.path.exists(new_path):
+                            base_name = os.path.splitext(os.path.basename(json_file))[0]
+                            counter = 1
+                            while os.path.exists(new_path):
+                                new_name = f"{base_name}_{counter}.json"
+                                new_path = os.path.join(target_dir, new_name)
+                                counter += 1
+                        
+                        shutil.move(json_file, new_path)
+                # Bỏ qua phần tạo folders mới và shuffle cho animations
+                continue
+            
+            # Logic cũ cho render_controllers và animation_controllers
             # Tạo 2-5 thư mục con ngẫu nhiên
             num_folders = random.randint(2, 5)
             created_dirs = []
@@ -404,7 +432,7 @@ def rename_json_files():
                 os.makedirs(folder_path, exist_ok=True)
                 created_dirs.append(folder_path)
             
-            # Thu thập tất cả thư mục con (bao gồm cả thư mục vừa tạo và thư mục có sẵn)
+            # Thu thập tất cả thư mục con (bao gồm cả thư mục vừa tạo và thư mục có sẵn đã rename)
             all_dirs = created_dirs.copy()
             for root, dirs, files in os.walk(directory):
                 if root != directory:
@@ -417,7 +445,7 @@ def rename_json_files():
             if not all_dirs:
                 all_dirs = created_dirs
             
-            # Xáo trộn 100% file vào các thư mục con
+            # Xáo trộn 100% file JSON vào TẤT CẢ thư mục (bao gồm cả lồng nhau)
             for json_file in json_files_after_rename:
                 if all_dirs:
                     target_dir = random.choice(all_dirs)
