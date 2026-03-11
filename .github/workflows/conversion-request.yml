@@ -44,7 +44,7 @@ jobs:
     steps:
       - name: Issue Forms Body Parser
         id: parse-issue
-        uses: zentered/issue-forms-body-parser@v2.2.1
+        uses: zentered/issue-forms-body-parser@v2.2.0
       - name: Parse Issue Body
         id: parse-body
         run: |
