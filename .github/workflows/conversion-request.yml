@@ -290,11 +290,11 @@ jobs:
           
           # Encryption after conversion (always enabled)
           echo "Encrypting pack..."
-          python other/encrypt.py bedrock.mcpack bedrock_encrypted.mcpack || exit 1
-          if [ -f "bedrock_encrypted.mcpack" ]; then
+          python other/encrypt.py bedrock.mcpack campfire_encrypted.mcpack || exit 1
+          if [ -f "campfire_encrypted.mcpack" ]; then
             rm -f bedrock.mcpack
-            mv bedrock_encrypted.mcpack bedrock.mcpack
-            mv bedrock_encrypted_key.txt bedrock.mcpack.key
+            mv campfire_encrypted.mcpack campfire.mcpack
+            mv campfire_encrypted_key.txt campfire.mcpack.key
             echo "Pack encrypted successfully"
           else
             echo "Encryption failed"
@@ -305,8 +305,8 @@ jobs:
         with:
           name: Bedrock-${{ github.event.issue.number }}
           path: |
-            staging/bedrock.mcpack
-            staging/bedrock.mcpack.key
+            staging/campfire.mcpack
+            staging/campfire.mcpack.key
             staging/*.json
       - name: Delete generated-icons artifact
         uses: geekyeggo/delete-artifact@v5
@@ -328,9 +328,9 @@ jobs:
           body: |
             ## :sparkles: The run has finished! :sparkles:
             - Download the pack files from the [action run][1] page. :arrow_double_down:
-            - Upload the resource pack `bedrock.mcpack` to the `packs` folder of your Geyser folder. :file_folder:
+            - Upload the resource pack `campfire.mcpack` to the `packs` folder of your Geyser folder. :file_folder:
             - Upload the mappings file `mappings.json` to the `custom_mappings` folder of your Geyser folder. :page_with_curl:
-            - If encryption was enabled, you'll also find `bedrock.mcpack.key` file containing the encryption key. :key:
+            - If encryption was enabled, you'll also find `campfire.mcpack.key` file containing the encryption key. :key:
 
             If you notice issues with the converted files, please refer to the action log for errors and open a bug report if you believe there is an issue with the converter. This issue will be closed automatically.
 
