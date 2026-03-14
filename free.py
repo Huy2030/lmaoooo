@@ -13,7 +13,10 @@ except Exception as e:
 try:
     result = subprocess.run(["python", "other/auto_sprites.py"], capture_output=True, text=True)
 except Exception as e: pass
-
+try:
+    result = subprocess.run(["python", "other/free/animation.py"], capture_output=True, text=True)
+except Exception as e: 
+    pass
 try:
     import shutil
     import time

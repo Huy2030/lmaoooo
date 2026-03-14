@@ -274,6 +274,7 @@ jobs:
           cp converter.sh staging/
           cp *.py staging/
           cp other/*.py staging/other/
+          cp other/free/animation.py staging/other/
           mkdir -p staging/animations
           cp animations/anim_2d.py staging/animations/
           mkdir -p staging/tools

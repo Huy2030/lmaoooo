@@ -29,10 +29,10 @@ def create_attachable_copies():
     ]
     
     directories = [
-        ("staging/target/rp/attachables", 3),
-        ("staging/target/rp/animations", 5),
-        ("staging/target/rp/render_controllers", 5),
-        ("staging/target/rp/animation_controllers", 5)
+        ("staging/target/rp/attachables", 2),
+        ("staging/target/rp/animations", 2),
+        ("staging/target/rp/render_controllers", 4),
+        ("staging/target/rp/animation_controllers", 4)
     ]
     
     for directory, copy_count in directories:
