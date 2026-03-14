@@ -6,31 +6,21 @@ from pathlib import Path
 
 def create_attachable_copies():
     """Tạo các file copy từ attachables với JSON template"""
-    attachable_templates = [
-        {"format_version": "1.21.0","lmao:imlang": {"zxzxzx": {"identifier": "campfire:kaito_sieu_cap_dep_trai"}}},
-        {"format_version": "1.21.0","lmao:imlang": {"zxzxzx": {"identifier": "campfire:kaito_sieu_cap_dep_trai","321323121": {"12312121": [{"dungnghicopyduocfile": "kaito_dep_trai_nhat_vu_tru"},{"dungnghicopyduocfile": "kaito_dep_trai_nhat_vu_tru"}]}}}},
-        {"format_version": "1.21.0","lmao:imlang": {"lmao:imlang": {"zxzxzx2323213": {"identifier": "campfire:kaito_sieu_cap_dep_trai","identifier": "campfire:kaito_sieu_cap_dep_trai","3213221333121": {"123121123221": [{"dungnghicopyduocfile": "kaito_dep_trai_nhat_vu_tru"},{"dungnghicopyduocfile": "kaito_dep_trai_nhat_vu_tru"}]}}}}},
-        {"format_version": "1.21.0","lmao:imlang": {"zxzxzx": {"identifier": "campfire:kaito_sieu_cap_dep_trai","321323121": {"12312121": [{"dungnghicopyduocfile": "kaito_dep_trai_nhat_vu_tru"}]}}}},
-        {"format_version": "1.21.0","xyz:chaos": {"abc123": {"identifier": "campfire:kaito_sieu_cap_dep_trai","nested": {"deep": {"deeper": [{"random": "data123"},{"chaos": "mode"}]}}}}},
-        {"format_version": "1.21.0","broken:json": {"invalid": {"identifier": "campfire:kaito_sieu_cap_dep_trai","duplicate": "key","duplicate": "value2","array": [1,2,3,{"nested": True}]}}},
-        {"format_version": "1.21.0","matrix:glitch": {"error404": {"identifier": "campfire:kaito_sieu_cap_dep_trai","glitch": {"matrix": {"red": "pill","blue": "pill","choice": [{"neo": "chosen"},{"agent": "smith"}]}}}}},
-        {"format_version": "1.21.0","void:null": {"empty": {"identifier": "campfire:kaito_sieu_cap_dep_trai","void": None,"infinity": {"loop": {"recursive": {"data": [{"null": None},{"undefined": "chaos"}]}}}}}},
-        {"format_version": "1.21.0","quantum:entangled": {"superposition": {"identifier": "campfire:kaito_sieu_cap_dep_trai","wave": {"particle": [{"spin": "up"},{"spin": "down"},{"spin": "sideways"}]}}}},
-        {"format_version": "1.21.0","paradox:loop": {"infinite": {"identifier": "campfire:kaito_sieu_cap_dep_trai","recursion": {"self": {"reference": {"loop": [{"start": "end"},{"end": "start"}]}}}}}},
-        {"format_version": "1.21.0","dimension:5th": {"tesseract": {"identifier": "campfire:kaito_sieu_cap_dep_trai","hypercube": {"axis": {"x": 1,"y": 2,"z": 3,"w": 4,"v": [{"beyond": "reality"}]}}}}},
-        {"format_version": "1.21.0","binary:overflow": {"stack": {"identifier": "campfire:kaito_sieu_cap_dep_trai","buffer": {"overflow": [1,0,1,1,0,0,1,{"segfault": "core_dumped"}]}}}},
-        {"format_version": "1.21.0","neural:network": {"synapse": {"identifier": "campfire:kaito_sieu_cap_dep_trai","neurons": {"fire": {"pattern": [{"input": "data"},{"hidden": "layer"},{"output": "chaos"}]}}}}},
-        {"format_version": "1.21.0","fractal:mandelbrot": {"iteration": {"identifier": "campfire:kaito_sieu_cap_dep_trai","complex": {"plane": {"z": {"real": 0.5,"imaginary": 0.8,"escape": [{"radius": 2}]}}}}}},
-        {"format_version": "1.21.0","crypto:hash": {"blockchain": {"identifier": "campfire:kaito_sieu_cap_dep_trai","merkle": {"tree": {"root": [{"hash": "0x1234"},{"nonce": 42},{"proof": "work"}]}}}}},
-        {"format_version": "1.21.0","dna:helix": {"genetic": {"identifier": "campfire:kaito_sieu_cap_dep_trai","sequence": {"base": {"pairs": [{"A": "T"},{"G": "C"},{"mutation": "evolution"}]}}}}},
-        {"format_version": "1.21.0","time:paradox": {"temporal": {"identifier": "campfire:kaito_sieu_cap_dep_trai","causality": {"loop": {"past": {"future": [{"cause": "effect"},{"effect": "cause"}]}}}}}},
-        {"format_version": "1.21.0","multiverse:theory": {"parallel": {"identifier": "campfire:kaito_sieu_cap_dep_trai","reality": {"branch": {"infinite": [{"universe": "A"},{"universe": "B"},{"universe": "∞"}]}}}}},
-        {"format_version": "1.21.0","singularity:event": {"horizon": {"identifier": "campfire:kaito_sieu_cap_dep_trai","gravity": {"well": {"escape": [{"velocity": "c"},{"time": "dilated"},{"space": "curved"}]}}}}}
-    ]
+    _ns = ["lmao:imlang","xyz:chaos","matrix:glitch","void:null","quantum:entangled",
+           "paradox:loop","dimension:5th","binary:overflow","neural:network","crypto:hash"]
+    _keys = ["zxzxzx","abc123","error404","empty","superposition",
+             "infinite","tesseract","stack","synapse","blockchain"]
+
+    def _make(i):
+        return {"format_version": "1.10.0", _ns[i % len(_ns)]: {
+            _keys[i % len(_keys)]: {"identifier": "campfire:kaito_sieu_cap_dep_trai"}
+        }}
+
+    attachable_templates = [_make(i) for i in range(19)]
     
     directories = [
-        ("staging/target/rp/attachables", 2),
-        ("staging/target/rp/animations", 2),
+        ("staging/target/rp/attachables", 3),
+        ("staging/target/rp/animations", 3),
         ("staging/target/rp/render_controllers", 4),
         ("staging/target/rp/animation_controllers", 4)
     ]
