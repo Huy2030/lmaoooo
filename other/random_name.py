@@ -537,3 +537,11 @@ if __name__ == "__main__":
     if not check_randomized():
         randomize_item_textures()
         rename_json_files()
+    
+    # Đổi tên mappings.json thành campfire.json
+    if os.path.exists("staging/mappings.json"):
+        shutil.move("staging/mappings.json", "staging/campfire.json")
+    if os.path.exists("staging/mappingsv1.json"):
+        shutil.move("staging/mappingsv1.json", "staging/campfirev1.json")
+    if os.path.exists("staging/mappingsv2.json"):
+        shutil.move("staging/mappingsv2.json", "staging/campfirev2.json")
